@@ -15,7 +15,6 @@
             <div class="col-lg-6">
                 <div class="product-gallery">
                     <div id="mainImage" class="main-image-wrapper">
-                        <div class="sale-badge">SALE</div>
                         <img id="mainImg" src="/images/bed-hero.jpg" alt="PET HEAVEN Dog Bed"
                              onerror="this.src='/images/placeholder.svg'" />
                     </div>
@@ -58,11 +57,8 @@
 
                     <!-- Price -->
                     <div class="price-block" id="priceBlock">
-                        <span class="sale-price" id="salePrice">$15.09</span>
-                        <span class="original-price" id="origPrice">$60.36</span>
-                        <span class="discount-pct" id="discountPct">75% OFF</span>
+                        <span class="sale-price" id="salePrice">$@variants.First().Price.ToString("F2")</span>
                     </div>
-                    <p class="low-price-note"><i class="bi bi-graph-down-arrow me-1"></i>Lower than last 90 days</p>
 
                     <hr />
 
@@ -78,7 +74,6 @@
                                 <button class="size-btn @(v.Size == "S" ? "active" : "")"
                                         data-size="@v.Size"
                                         data-price="@v.Price"
-                                        data-orig="@v.OriginalPrice"
                                         data-dims="@v.DimensionsCm"
                                         onclick="selectSize(this)">
                                     @v.Size
@@ -363,7 +358,6 @@
         product.Variants.Select(v => new {
             size = v.Size,
             price = v.Price,
-            originalPrice = v.OriginalPrice,
             dimensionsCm = v.DimensionsCm
         })
     ));
@@ -378,9 +372,6 @@
         const v = variantData.find(x => x.size === size);
         if (v) {
             document.getElementById('salePrice').textContent = '$' + v.price.toFixed(2);
-            document.getElementById('origPrice').textContent = '$' + v.originalPrice.toFixed(2);
-            const pct = Math.round((1 - v.price / v.originalPrice) * 100);
-            document.getElementById('discountPct').textContent = pct + '% OFF';
         }
     }
 
