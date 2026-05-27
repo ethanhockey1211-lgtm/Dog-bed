@@ -1,6 +1,7 @@
 using DogBed.Models;
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace DogBed.Services;
 
@@ -17,24 +18,14 @@ public class EmailService
 
     public async Task SendOrderNotificationAsync(FulfillmentOrder order)
     {
-        var gmailUser = _config["Email:GmailUser"];
-        var gmailPass = _config["Email:GmailAppPassword"];
-        var notifyTo  = _config["Email:NotifyTo"] ?? gmailUser;
-
-        if (string.IsNullOrEmpty(gmailUser) || string.IsNullOrEmpty(gmailPass))
-        {
-            _logger.LogWarning("Email not configured — skipping order notification");
-            return;
-        }
-
         var items = string.Join("\n", order.Items.Select(i =>
             $"  • Size {i.Size} ({i.DimensionsCm}) x{i.Quantity} — ${i.LineTotal:F2}"));
 
         var body = $"""
             NEW ORDER — PET HEAVEN
             ══════════════════════════════════
-            Order Ref:  {order.StripeSessionId[^8..].ToUpper()}
-            Date:       {order.CreatedAt:MMM d, yyyy h:mm tt}
+            Order Ref:  #{order.StripeSessionId[^8..].ToUpper()}
+            Date:       {order.CreatedAt:MMM d, yyyy h:mm tt} UTC
             Amount:     ${order.AmountPaid:F2}
 
             CUSTOMER
@@ -50,29 +41,81 @@ public class EmailService
             ITEMS
             {items}
             ══════════════════════════════════
-            Go to AliExpress and place this order to the address above.
+            Go to AliExpress and ship to the address above.
             """;
+
+        await SendAsync(
+            to: _config["Email:NotifyTo"] ?? _config["Email:GmailUser"]!,
+            subject: $"🛒 New Order #{order.StripeSessionId[^8..].ToUpper()} — ${order.AmountPaid:F2}",
+            body: body);
+    }
+
+    public async Task SendBuyerConfirmationAsync(FulfillmentOrder order)
+    {
+        if (string.IsNullOrEmpty(order.CustomerEmail)) return;
+
+        var items = string.Join("\n", order.Items.Select(i =>
+            $"  • Size {i.Size} x{i.Quantity} — ${i.LineTotal:F2}"));
+
+        var body = $"""
+            Hi {order.CustomerName.Split(' ')[0]},
+
+            Thank you for your order! 🐾 We've received your payment and are preparing your PET HEAVEN dog bed for shipment.
+
+            ORDER SUMMARY
+            ══════════════════════════════════
+            Order Ref:  #{order.StripeSessionId[^8..].ToUpper()}
+            Amount:     ${order.AmountPaid:F2}
+
+            {items}
+
+            SHIPPING TO
+            {order.Address}
+            {order.City}, {order.State} {order.ZipCode}
+
+            ══════════════════════════════════
+            You'll receive a shipping confirmation once your order is on its way.
+            Questions? Reply to this email.
+
+            — The PET HEAVEN Team
+            """;
+
+        await SendAsync(
+            to: order.CustomerEmail,
+            subject: $"Your PET HEAVEN order #{order.StripeSessionId[^8..].ToUpper()} is confirmed!",
+            body: body);
+    }
+
+    private async Task SendAsync(string to, string subject, string body)
+    {
+        var gmailUser = _config["Email:GmailUser"];
+        var gmailPass = _config["Email:GmailAppPassword"];
+
+        if (string.IsNullOrEmpty(gmailUser) || string.IsNullOrEmpty(gmailPass))
+        {
+            _logger.LogWarning("Email not configured — skipping notification");
+            return;
+        }
 
         try
         {
-            using var client = new SmtpClient("smtp.gmail.com", 587)
-            {
-                EnableSsl   = true,
-                Credentials = new NetworkCredential(gmailUser, gmailPass)
-            };
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("PET HEAVEN", gmailUser));
+            message.To.Add(MailboxAddress.Parse(to));
+            message.Subject = subject;
+            message.Body = new TextPart("plain") { Text = body };
 
-            var msg = new MailMessage(gmailUser, notifyTo!)
-            {
-                Subject = $"🛒 New Order #{order.StripeSessionId[^8..].ToUpper()} — ${order.AmountPaid:F2}",
-                Body    = body
-            };
+            using var client = new SmtpClient();
+            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(gmailUser, gmailPass);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
 
-            await client.SendMailAsync(msg);
-            _logger.LogInformation("Order notification sent for {Id}", order.Id);
+            _logger.LogInformation("Email sent to {To}", to);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send order notification email");
+            _logger.LogError(ex, "Failed to send email to {To}: {Msg}", to, ex.Message);
         }
     }
 }

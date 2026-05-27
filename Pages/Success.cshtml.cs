@@ -50,6 +50,7 @@ public class SuccessModel : PageModel
             _store.Save(order);
             await _queue.EnqueueAsync(order);
             await _email.SendOrderNotificationAsync(order);
+            await _email.SendBuyerConfirmationAsync(order);
             Order = order;
         }
         catch { /* Stripe key not set or invalid session — show generic success */ }
