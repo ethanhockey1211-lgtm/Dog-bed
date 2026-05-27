@@ -10,11 +10,13 @@ public class SuccessModel : PageModel
 {
     private readonly OrderStore _store;
     private readonly OrderQueue _queue;
+    private readonly EmailService _email;
 
-    public SuccessModel(OrderStore store, OrderQueue queue)
+    public SuccessModel(OrderStore store, OrderQueue queue, EmailService email)
     {
         _store = store;
         _queue = queue;
+        _email = email;
     }
 
     public FulfillmentOrder? Order { get; private set; }
@@ -47,6 +49,7 @@ public class SuccessModel : PageModel
             var order = BuildOrder(session);
             _store.Save(order);
             await _queue.EnqueueAsync(order);
+            await _email.SendOrderNotificationAsync(order);
             Order = order;
         }
         catch { /* Stripe key not set or invalid session — show generic success */ }

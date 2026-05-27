@@ -21,6 +21,7 @@ builder.Services.AddSingleton<OrderStore>();
 builder.Services.AddSingleton<OrderQueue>();
 builder.Services.AddSingleton<FulfillmentService>();
 builder.Services.AddSingleton<StripeCheckoutService>();
+builder.Services.AddSingleton<EmailService>();
 builder.Services.AddHostedService<OrderQueueWorker>();
 builder.Services.AddHttpContextAccessor();
 
