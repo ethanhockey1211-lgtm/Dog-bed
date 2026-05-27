@@ -38,10 +38,10 @@ public class ProductService
                 },
                 Variants = new List<ProductVariant>
                 {
-                    new ProductVariant { Size = "S", DimensionsCm = "47×35×17 cm", DimensionsInch = "18.5×13.8×6.7 in", Price = 15.09m, OriginalPrice = 60.36m, Color = "Gray", Stock = 50 },
-                    new ProductVariant { Size = "M", DimensionsCm = "60×50×20 cm", DimensionsInch = "23.6×19.7×7.9 in", Price = 19.99m, OriginalPrice = 74.99m, Color = "Gray", Stock = 40 },
-                    new ProductVariant { Size = "L", DimensionsCm = "80×60×23 cm", DimensionsInch = "31.5×23.6×9.1 in", Price = 25.99m, OriginalPrice = 89.99m, Color = "Gray", Stock = 35 },
-                    new ProductVariant { Size = "XL", DimensionsCm = "100×80×26 cm", DimensionsInch = "39.4×31.5×10.2 in", Price = 32.99m, OriginalPrice = 109.99m, Color = "Gray", Stock = 20 },
+                    new ProductVariant { Size = "S", DimensionsCm = "47×35×17 cm", DimensionsInch = "18.5×13.8×6.7 in", Price = 24.45m, OriginalPrice = 97.78m, Color = "Gray", Stock = 50 },
+                    new ProductVariant { Size = "M", DimensionsCm = "60×50×20 cm", DimensionsInch = "23.6×19.7×7.9 in", Price = 32.38m, OriginalPrice = 121.48m, Color = "Gray", Stock = 40 },
+                    new ProductVariant { Size = "L", DimensionsCm = "80×60×23 cm", DimensionsInch = "31.5×23.6×9.1 in", Price = 42.10m, OriginalPrice = 145.78m, Color = "Gray", Stock = 35 },
+                    new ProductVariant { Size = "XL", DimensionsCm = "100×80×26 cm", DimensionsInch = "39.4×31.5×10.2 in", Price = 53.44m, OriginalPrice = 178.18m, Color = "Gray", Stock = 20 },
                 },
                 Reviews = new List<Review>
                 {

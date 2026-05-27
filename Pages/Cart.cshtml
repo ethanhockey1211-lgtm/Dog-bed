@@ -74,17 +74,8 @@
                     </div>
                     <div class="summary-row">
                         <span>Shipping</span>
-                        <span class="@(Model.Cart.Shipping == 0 ? "text-success fw-semibold" : "")">
-                            @(Model.Cart.Shipping == 0 ? "FREE" : "$" + Model.Cart.Shipping.ToString("F2"))
-                        </span>
+                        <span class="text-success fw-semibold">FREE</span>
                     </div>
-                    @if (Model.Cart.Shipping > 0)
-                    {
-                        <div class="free-ship-banner">
-                            <i class="bi bi-truck me-2"></i>
-                            Add <strong>$@((35 - Model.Cart.Subtotal).ToString("F2"))</strong> more for free shipping!
-                        </div>
-                    }
                     <hr />
                     <div class="summary-row total-row">
                         <span>Total</span>

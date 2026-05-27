@@ -16,7 +16,7 @@ public class Cart
 {
     public List<CartItem> Items { get; set; } = new();
     public decimal Subtotal => Items.Sum(i => i.LineTotal);
-    public decimal Shipping => Subtotal >= 35 ? 0 : 4.99m;
+    public decimal Shipping => 0m;
     public decimal Total => Subtotal + Shipping;
     public int ItemCount => Items.Sum(i => i.Quantity);
 }
