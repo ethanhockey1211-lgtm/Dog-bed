@@ -7,28 +7,48 @@ namespace DogBed.Pages;
 
 public class CheckoutModel : PageModel
 {
+    private readonly StripeCheckoutService _stripe;
+
+    public CheckoutModel(StripeCheckoutService stripe)
+    {
+        _stripe = stripe;
+    }
+
     [BindProperty]
     public Order Order { get; set; } = new();
 
     public Cart Cart { get; set; } = new();
-    public bool OrderPlaced { get; set; }
-    public string OrderNumber { get; set; } = "";
 
     public void OnGet()
     {
         Cart = CartService.GetCart(HttpContext.Session);
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         Cart = CartService.GetCart(HttpContext.Session);
 
-        if (!ModelState.IsValid)
-            return Page();
+        if (!Cart.Items.Any())
+            return RedirectToPage("/Cart");
 
-        OrderNumber = new Random().Next(100000, 999999).ToString();
+        // Basic server-side validation
+        if (string.IsNullOrWhiteSpace(Order.FirstName) ||
+            string.IsNullOrWhiteSpace(Order.LastName)  ||
+            string.IsNullOrWhiteSpace(Order.Email)     ||
+            string.IsNullOrWhiteSpace(Order.Address)   ||
+            string.IsNullOrWhiteSpace(Order.City)      ||
+            string.IsNullOrWhiteSpace(Order.ZipCode))
+        {
+            ModelState.AddModelError("", "Please fill in all required fields.");
+            return Page();
+        }
+
+        var baseUrl    = $"{Request.Scheme}://{Request.Host}";
+        var stripeUrl  = await _stripe.CreateSessionAsync(Cart, Order, baseUrl);
+
+        // Clear session cart — Stripe webhook confirms payment before fulfillment
         CartService.ClearCart(HttpContext.Session);
-        OrderPlaced = true;
-        return Page();
+
+        return Redirect(stripeUrl);
     }
 }

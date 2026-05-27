@@ -1,0 +1,73 @@
+@page
+@model OrdersModel
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="container py-5">
+    <h1 class="page-title mb-1">Orders</h1>
+    <p class="text-muted mb-4">Every paid order — fulfill each one on AliExpress using the shipping details below.</p>
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-3 d-block mb-3"></i>
+            No orders yet. They'll appear here after customers pay.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table size-table">
+                <thead>
+                    <tr>
+                        <th>Ref</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Ship To</th>
+                        <th>Items</th>
+                        <th>Paid</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model.Orders)
+                    {
+                        <tr>
+                            <td><code class="small">#PH-@o.Id</code></td>
+                            <td class="small">@o.CreatedAt.ToString("MMM d, h:mm tt")</td>
+                            <td>
+                                <div class="fw-semibold small">@o.CustomerName</div>
+                                <div class="text-muted" style="font-size:.75rem">@o.CustomerEmail</div>
+                                @if (!string.IsNullOrWhiteSpace(o.Phone))
+                                {
+                                    <div class="text-muted" style="font-size:.75rem">@o.Phone</div>
+                                }
+                            </td>
+                            <td class="small">
+                                @o.Address<br />
+                                @o.City, @o.State @o.ZipCode<br />
+                                @o.Country
+                            </td>
+                            <td>
+                                @foreach (var item in o.Items)
+                                {
+                                    <div class="small">
+                                        <strong>@item.Size</strong> × @item.Quantity
+                                        <span class="text-muted">(@item.DimensionsCm)</span>
+                                    </div>
+                                }
+                            </td>
+                            <td class="fw-bold">$@o.AmountPaid.ToString("F2")</td>
+                            <td>
+                                <span class="status-pill status-@o.Status.ToString().ToLower()">
+                                    @o.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

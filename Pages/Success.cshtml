@@ -1,0 +1,45 @@
+@page
+@model SuccessModel
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<div class="container py-5">
+    <div class="confirmation-card text-center">
+        <div class="confirm-icon mb-3">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2 class="mb-2">Thank you for your order!</h2>
+        <p class="text-muted mb-1">
+            A confirmation email is on its way to
+            <strong>@(Model.CustomerEmail ?? "your inbox")</strong>.
+        </p>
+        <p class="text-muted">Your bed will be packed and shipped within 1–3 business days.</p>
+
+        <div class="confirm-details mt-4 mb-4">
+            <div class="confirm-detail-row">
+                <span>Order reference</span>
+                <span><strong>#PH-@Model.OrderRef</strong></span>
+            </div>
+            <div class="confirm-detail-row">
+                <span>Estimated delivery</span>
+                <span><strong>@DateTime.Now.AddDays(7).ToString("MMMM d") – @DateTime.Now.AddDays(14).ToString("MMMM d, yyyy")</strong></span>
+            </div>
+            @if (Model.Order != null)
+            {
+                <div class="confirm-detail-row">
+                    <span>Amount paid</span>
+                    <span><strong>$@Model.Order.AmountPaid.ToString("F2")</strong></span>
+                </div>
+                <div class="confirm-detail-row">
+                    <span>Ship to</span>
+                    <span><strong>@Model.Order.Address, @Model.Order.City @Model.Order.ZipCode</strong></span>
+                </div>
+            }
+        </div>
+
+        <a asp-page="/Index" class="btn btn-add-cart px-5">
+            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+        </a>
+    </div>
+</div>

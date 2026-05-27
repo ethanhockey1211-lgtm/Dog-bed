@@ -881,6 +881,38 @@ hr { border-color: var(--border); opacity: 1; }
 .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 
+/* ─── Stripe Redirect Notice ────────────────────────────── */
+.stripe-redirect-notice {
+    background: #f8f7ff;
+    border: 1.5px solid #e0dcff;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+}
+.stripe-logo-row {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .65rem;
+    font-weight: 600;
+    font-size: .9rem;
+    color: #32325d;
+}
+
+/* ─── Order Status Pills ─────────────────────────────────── */
+.status-pill {
+    display: inline-block;
+    padding: .2rem .7rem;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: capitalize;
+}
+.status-pending    { background: #fff8e1; color: #b45309; }
+.status-processing { background: #e0f0ff; color: #1d4ed8; }
+.status-fulfilled  { background: var(--primary-light); color: var(--primary-dark); }
+.status-failed     { background: #fee2e2; color: #b91c1c; }
+
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 991px) {
     .product-gallery { position: static; }

@@ -1,0 +1,15 @@
+@page
+@{
+    ViewData["Title"] = "Payment Cancelled";
+}
+
+<div class="container py-5 text-center">
+    <div style="font-size:4rem; color: var(--text-muted);" class="mb-3">
+        <i class="bi bi-x-circle"></i>
+    </div>
+    <h2 class="mb-2">Payment cancelled</h2>
+    <p class="text-muted mb-4">No charge was made. Your cart is still saved.</p>
+    <a asp-page="/Cart" class="btn btn-add-cart px-5">
+        <i class="bi bi-arrow-left me-2"></i>Back to Cart
+    </a>
+</div>
