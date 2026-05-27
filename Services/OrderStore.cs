@@ -96,8 +96,7 @@ public class OrderStore
 
     private async Task<NpgsqlConnection> OpenAsync()
     {
-        var builder = new NpgsqlConnectionStringBuilder(_connStr) { SslMode = SslMode.Require };
-        var conn = new NpgsqlConnection(builder.ConnectionString);
+        var conn = new NpgsqlConnection(_connStr);
         await conn.OpenAsync();
         return conn;
     }
