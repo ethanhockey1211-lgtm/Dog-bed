@@ -16,6 +16,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly  = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<DogBed.Services.ProductService>();
 builder.Services.AddSingleton<OrderStore>();
 builder.Services.AddSingleton<OrderQueue>();
