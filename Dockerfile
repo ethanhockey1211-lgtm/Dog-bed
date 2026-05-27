@@ -2,9 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY DogBed.csproj .
-RUN dotnet restore
+RUN dotnet restore DogBed.csproj
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish DogBed.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
