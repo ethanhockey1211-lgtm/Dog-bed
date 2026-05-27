@@ -30,11 +30,10 @@ public class ProductService
                 },
                 Images = new List<string>
                 {
-                    "/images/bed-hero.jpg",
-                    "/images/bed-corgi.jpg",
-                    "/images/bed-golden.jpg",
-                    "/images/bed-wash.jpg",
-                    "/images/bed-product.jpg"
+                    "/images/IMG_1046.jpeg",
+                    "/images/IMG_1047.jpeg",
+                    "/images/IMG_1048.jpeg",
+                    "/images/IMG_1049.jpeg"
                 },
                 Variants = new List<ProductVariant>
                 {
