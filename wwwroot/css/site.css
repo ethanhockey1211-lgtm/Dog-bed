@@ -890,3 +890,65 @@ hr { border-color: var(--border); opacity: 1; }
     .cart-item-price { width: 100%; text-align: left; }
     .product-section { padding-top: 1.5rem; }
 }
+
+@media (max-width: 576px) {
+    /* Navbar */
+    .navbar { padding: .65rem 0; }
+    .navbar-brand { font-size: 1.15rem; }
+
+    /* Announcement bar */
+    .announcement-bar { font-size: .7rem; padding: .4rem .75rem; }
+
+    /* Product page */
+    .product-section { padding-top: 1rem; padding-bottom: 2rem; }
+    .product-info { padding-left: 0; margin-top: 1.25rem; }
+    .product-title { font-size: 1.45rem; }
+    .sale-price { font-size: 1.9rem; }
+
+    /* Thumbnails - 4 in a row on small screens */
+    .thumb-btn { width: calc(25% - .4rem); height: auto; aspect-ratio: 1; }
+    .thumbnail-row { gap: .4rem; }
+
+    /* Size buttons - fill width */
+    .size-buttons { gap: .45rem; }
+    .size-btn { min-width: calc(25% - .35rem); flex: 1; padding: .6rem .5rem; }
+
+    /* CTA buttons - bigger tap targets */
+    .btn-add-cart, .btn-buy-now, a.btn-buy-now {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+    }
+
+    /* Trust badges - single column on very small screens */
+    .trust-badges { grid-template-columns: 1fr; gap: .5rem; padding: .85rem; }
+
+    /* Sections */
+    .section-title { font-size: 1.5rem; }
+    .features-section .py-5 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+
+    /* Cart */
+    .cart-item { padding: 1rem; gap: .85rem; }
+    .cart-item-img { width: 72px; height: 72px; }
+    .cart-item-details h6 { font-size: .9rem; }
+    .order-summary-card { padding: 1.25rem; }
+    .page-title { font-size: 1.6rem; }
+
+    /* Checkout */
+    .checkout-section { padding: 1.25rem; }
+    .confirmation-card { padding: 2rem 1.25rem; }
+
+    /* Footer */
+    .site-footer { padding: 2.5rem 0 1.5rem; margin-top: 3rem; }
+    .footer-brand { font-size: 1.1rem; }
+
+    /* Size table - horizontal scroll */
+    .size-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .size-table { min-width: 480px; }
+
+    /* Reviews - stack on mobile */
+    .review-card { padding: 1.25rem; }
+
+    /* Stripe notice */
+    .stripe-redirect-notice { padding: 1rem; }
+    .stripe-logo-row { font-size: .82rem; }
+}
