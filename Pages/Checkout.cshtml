@@ -1,0 +1,183 @@
+@page
+@model CheckoutModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+    @if (Model.OrderPlaced)
+    {
+        <!-- Order Confirmation -->
+        <div class="confirmation-card text-center py-5">
+            <div class="confirm-icon mb-4">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h2 class="mb-2">Order Confirmed!</h2>
+            <p class="text-muted mb-1">Thank you, <strong>@Model.Order.FirstName</strong>! Your order has been placed.</p>
+            <p class="text-muted">A confirmation email will be sent to <strong>@Model.Order.Email</strong>.</p>
+            <div class="confirm-details mt-4 mb-4">
+                <div class="confirm-detail-row">
+                    <span>Order number</span>
+                    <span><strong>#PH-@Model.OrderNumber</strong></span>
+                </div>
+                <div class="confirm-detail-row">
+                    <span>Estimated delivery</span>
+                    <span><strong>@DateTime.Now.AddDays(7).ToString("MMMM d") – @DateTime.Now.AddDays(12).ToString("MMMM d, yyyy")</strong></span>
+                </div>
+            </div>
+            <a asp-page="/Index" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Shop
+            </a>
+        </div>
+    }
+    else
+    {
+        <h1 class="page-title mb-4"><i class="bi bi-lock-fill me-2"></i>Secure Checkout</h1>
+
+        <div class="row g-4">
+            <!-- Checkout Form -->
+            <div class="col-lg-7">
+                <form method="post" id="checkoutForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Shipping Info -->
+                    <div class="checkout-section mb-4">
+                        <h5 class="checkout-section-title">
+                            <span class="step-num">1</span> Shipping Information
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">First Name</label>
+                                <input asp-for="Order.FirstName" class="form-control" placeholder="Jane" required />
+                                <span asp-validation-for="Order.FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Last Name</label>
+                                <input asp-for="Order.LastName" class="form-control" placeholder="Smith" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email Address</label>
+                                <input asp-for="Order.Email" type="email" class="form-control" placeholder="jane@example.com" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Phone</label>
+                                <input asp-for="Order.Phone" type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <input asp-for="Order.Address" class="form-control" placeholder="123 Main St" required />
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label">City</label>
+                                <input asp-for="Order.City" class="form-control" placeholder="New York" required />
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">State</label>
+                                <input asp-for="Order.State" class="form-control" placeholder="NY" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">ZIP</label>
+                                <input asp-for="Order.ZipCode" class="form-control" placeholder="10001" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Info -->
+                    <div class="checkout-section mb-4">
+                        <h5 class="checkout-section-title">
+                            <span class="step-num">2</span> Payment Details
+                        </h5>
+                        <div class="ssl-badge mb-3">
+                            <i class="bi bi-shield-lock-fill text-success me-2"></i>
+                            Your payment info is encrypted and secure
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Name on Card</label>
+                                <input asp-for="Order.CardName" class="form-control" placeholder="Jane Smith" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Card Number</label>
+                                <input asp-for="Order.CardNumber" class="form-control" placeholder="•••• •••• •••• ••••"
+                                       maxlength="19" oninput="formatCard(this)" required />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Expiry Date</label>
+                                <input asp-for="Order.CardExpiry" class="form-control" placeholder="MM/YY"
+                                       maxlength="5" oninput="formatExpiry(this)" required />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">CVC</label>
+                                <input asp-for="Order.CardCvc" class="form-control" placeholder="•••"
+                                       maxlength="4" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-buy-now w-100 btn-lg">
+                        <i class="bi bi-lock-fill me-2"></i>Place Order · $@Model.Cart.Total.ToString("F2")
+                    </button>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-5">
+                <div class="order-summary-card sticky-top" style="top: 80px;">
+                    <h5 class="mb-4">Order Summary</h5>
+                    @if (!Model.Cart.Items.Any())
+                    {
+                        <p class="text-muted">Your cart is empty. <a asp-page="/Index">Shop now</a></p>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Cart.Items)
+                        {
+                            <div class="checkout-item">
+                                <div class="checkout-item-img">
+                                    <img src="/images/bed-hero.jpg" alt="@item.ProductName"
+                                         onerror="this.src='/images/placeholder.svg'" />
+                                    <span class="checkout-qty-badge">@item.Quantity</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold small">@item.ProductName</div>
+                                    <div class="text-muted x-small">Size @item.Size · @item.Color</div>
+                                </div>
+                                <div class="fw-bold">$@item.LineTotal.ToString("F2")</div>
+                            </div>
+                        }
+                        <hr />
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>$@Model.Cart.Subtotal.ToString("F2")</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span class="@(Model.Cart.Shipping == 0 ? "text-success fw-semibold" : "")">
+                                @(Model.Cart.Shipping == 0 ? "FREE" : "$" + Model.Cart.Shipping.ToString("F2"))
+                            </span>
+                        </div>
+                        <hr />
+                        <div class="summary-row total-row">
+                            <span>Total</span>
+                            <span>$@Model.Cart.Total.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    function formatCard(input) {
+        let val = input.value.replace(/\D/g, '').substring(0, 16);
+        input.value = val.replace(/(.{4})/g, '$1 ').trim();
+    }
+    function formatExpiry(input) {
+        let val = input.value.replace(/\D/g, '').substring(0, 4);
+        if (val.length >= 3) val = val.substring(0, 2) + '/' + val.substring(2);
+        input.value = val;
+    }
+</script>
+}

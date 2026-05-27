@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — PET HEAVEN Beds</title>
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    <!-- Announcement bar -->
+    <div class="announcement-bar">
+        <i class="bi bi-truck me-2"></i>Free shipping on orders over $35 &nbsp;|&nbsp;
+        <i class="bi bi-arrow-repeat me-2"></i>30-day returns &nbsp;|&nbsp;
+        <i class="bi bi-shield-check me-2"></i>Secure checkout
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" asp-page="/Index">
+                <span class="brand-icon"><i class="bi bi-heart-fill"></i></span>
+                PET HEAVEN
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-page="/Index">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a asp-page="/Cart" class="cart-btn position-relative">
+                        <i class="bi bi-bag fs-5"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand mb-3">
+                        <span class="brand-icon"><i class="bi bi-heart-fill"></i></span>
+                        PET HEAVEN
+                    </div>
+                    <p class="text-muted small">Premium comfort beds designed so your pet can rest like royalty.</p>
+                    <div class="social-links mt-3">
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-tiktok"></i></a>
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="footer-heading">Shop</h6>
+                    <ul class="footer-links">
+                        <li><a asp-page="/Index">Dog Beds</a></li>
+                        <li><a href="#">New Arrivals</a></li>
+                        <li><a href="#">Best Sellers</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="footer-heading">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="footer-heading">We accept</h6>
+                    <div class="payment-icons">
+                        <span><i class="bi bi-credit-card-2-front-fill"></i> Visa</span>
+                        <span><i class="bi bi-credit-card-fill"></i> Mastercard</span>
+                        <span><i class="bi bi-paypal"></i> PayPal</span>
+                        <span><i class="bi bi-apple"></i> Pay</span>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4" />
+            <p class="text-center text-muted small mb-0">
+                &copy; @DateTime.Now.Year PET HEAVEN. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Update cart badge from session storage
+        function refreshCartBadge() {
+            fetch('/api/cart/count')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('cartCount');
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.style.display = data.count > 0 ? 'flex' : 'none';
+                    }
+                }).catch(() => {});
+        }
+        refreshCartBadge();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
