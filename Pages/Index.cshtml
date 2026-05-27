@@ -95,7 +95,7 @@
                         <button class="btn btn-add-cart w-100 mb-2" onclick="addToCart()">
                             <i class="bi bi-bag-plus me-2"></i>Add to Cart
                         </button>
-                        <a asp-page="/Checkout" class="btn btn-buy-now w-100" id="buyNowBtn">
+                        <a asp-page="/Checkout" class="btn btn-buy-now w-100" id="buyNowBtn" onclick="return buyNow(event)">
                             <i class="bi bi-lightning-fill me-2"></i>Buy It Now
                         </a>
                     </div>
@@ -397,6 +397,20 @@
             const toast = new bootstrap.Toast(document.getElementById('cartToast'));
             toast.show();
             refreshCartBadge();
+        }
+    }
+
+    async function buyNow(e) {
+        e.preventDefault();
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
+        });
+        if (response.ok) {
+            window.location.href = '/Checkout';
         }
     }
 </script>

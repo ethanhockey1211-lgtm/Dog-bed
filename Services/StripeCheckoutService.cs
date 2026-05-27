@@ -55,21 +55,25 @@ public class StripeCheckoutService
             });
         }
 
-        // Minnesota sales tax 6.875%
-        var taxAmount = Math.Round(cart.Total * 0.06875m, 2);
-        lineItems.Add(new SessionLineItemOptions
+        // Minnesota sales tax 6.875% — only for MN customers
+        var state = shipping.State?.Trim().ToUpper();
+        if (state == "MN" || state == "MINNESOTA")
         {
-            PriceData = new SessionLineItemPriceDataOptions
+            var taxAmount = Math.Round(cart.Total * 0.06875m, 2);
+            lineItems.Add(new SessionLineItemOptions
             {
-                Currency  = "usd",
-                UnitAmountDecimal = taxAmount * 100,
-                ProductData = new SessionLineItemPriceDataProductDataOptions
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    Name = "Minnesota Sales Tax (6.875%)"
-                }
-            },
-            Quantity = 1
-        });
+                    Currency  = "usd",
+                    UnitAmountDecimal = taxAmount * 100,
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = "Minnesota Sales Tax (6.875%)"
+                    }
+                },
+                Quantity = 1
+            });
+        }
 
         var options = new SessionCreateOptions
         {
