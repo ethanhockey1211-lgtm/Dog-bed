@@ -11,12 +11,14 @@ public class SuccessModel : PageModel
     private readonly OrderStore _store;
     private readonly OrderQueue _queue;
     private readonly EmailService _email;
+    private readonly ILogger<SuccessModel> _logger;
 
-    public SuccessModel(OrderStore store, OrderQueue queue, EmailService email)
+    public SuccessModel(OrderStore store, OrderQueue queue, EmailService email, ILogger<SuccessModel> logger)
     {
-        _store = store;
-        _queue = queue;
-        _email = email;
+        _store  = store;
+        _queue  = queue;
+        _email  = email;
+        _logger = logger;
     }
 
     public FulfillmentOrder? Order { get; private set; }
@@ -29,7 +31,7 @@ public class SuccessModel : PageModel
 
         OrderRef = session_id.Length >= 8 ? session_id[^8..].ToUpper() : session_id;
 
-        // Already saved (e.g. from a previous page load)
+        // Already saved — emails were sent on first visit
         Order = _store.GetBySessionId(session_id);
         if (Order != null)
         {
@@ -37,23 +39,35 @@ public class SuccessModel : PageModel
             return;
         }
 
+        // Retrieve session from Stripe
+        Stripe.Checkout.Session? session = null;
         try
         {
-            var svc     = new SessionService();
-            var session = await svc.GetAsync(session_id);
+            var svc = new SessionService();
+            session = await svc.GetAsync(session_id);
             CustomerEmail = session.CustomerEmail;
-
-            if (session.PaymentStatus != "paid") return;
-
-            // Build and save the order directly — no webhook needed
-            var order = BuildOrder(session);
-            _store.Save(order);
-            await _queue.EnqueueAsync(order);
-            await _email.SendOrderNotificationAsync(order);
-            await _email.SendBuyerConfirmationAsync(order);
-            Order = order;
         }
-        catch { /* Stripe key not set or invalid session — show generic success */ }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve Stripe session {Id}", session_id);
+            return;
+        }
+
+        if (session.PaymentStatus != "paid")
+        {
+            _logger.LogWarning("Session {Id} payment status: {Status}", session_id, session.PaymentStatus);
+            return;
+        }
+
+        // Build and persist the order
+        var order = BuildOrder(session);
+        _store.Save(order);
+        await _queue.EnqueueAsync(order);
+        Order = order;
+
+        // Send emails — errors are logged inside EmailService but don't break the page
+        await _email.SendOrderNotificationAsync(order);
+        await _email.SendBuyerConfirmationAsync(order);
     }
 
     private static FulfillmentOrder BuildOrder(Stripe.Checkout.Session session)
