@@ -1,0 +1,5 @@
+[phases.build]
+cmds = ["dotnet publish DogBed.csproj -c Release -o /app --self-contained false"]
+
+[start]
+cmd = "dotnet /app/DogBed.dll"
