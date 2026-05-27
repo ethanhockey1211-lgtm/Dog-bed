@@ -8,10 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Stripe.net" Version="46.2.1" />
     <PackageReference Include="Microsoft.Playwright" Version="1.49.0" />
   </ItemGroup>
+
+  <!--
+    Playwright browser install — runs once after build.
+    If this step fails, open a terminal in the project folder and run:
+      dotnet build
+      pwsh bin\Debug\net9.0\playwright.ps1 install chromium
+  -->
+  <Target Name="InstallPlaywrightBrowsers" AfterTargets="Build">
+    <Exec Command="pwsh $(OutputPath)playwright.ps1 install chromium"
+          ContinueOnError="true"
+          StandardOutputImportance="Low" />
+  </Target>
 
 </Project>
