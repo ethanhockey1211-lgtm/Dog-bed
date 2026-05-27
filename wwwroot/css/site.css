@@ -24,6 +24,11 @@
 
 * { box-sizing: border-box; }
 
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 body {
     font-family: var(--font-body);
     color: var(--text);
@@ -941,9 +946,10 @@ hr { border-color: var(--border); opacity: 1; }
     .site-footer { padding: 2.5rem 0 1.5rem; margin-top: 3rem; }
     .footer-brand { font-size: 1.1rem; }
 
-    /* Size table - horizontal scroll */
-    .size-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    /* Size table - horizontal scroll within its box only */
+    .size-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
     .size-table { min-width: 480px; }
+    .table-responsive { max-width: 100%; }
 
     /* Reviews - stack on mobile */
     .review-card { padding: 1.25rem; }
