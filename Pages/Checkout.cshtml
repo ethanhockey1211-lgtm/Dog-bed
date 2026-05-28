@@ -93,16 +93,6 @@
             </form>
         </div>
 
-@section Scripts {
-<script>
-    fbq('track', 'InitiateCheckout', {
-        value: @Model.Cart.Total.ToString("F2"),
-        currency: 'USD',
-        num_items: @Model.Cart.Items.Sum(i => i.Quantity)
-    });
-</script>
-}
-
         <!-- Order Summary -->
         <div class="col-lg-5">
             <div class="order-summary-card sticky-top" style="top: 90px;">
@@ -147,3 +137,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    fbq('track', 'InitiateCheckout', {
+        value: @Model.Cart.Total.ToString("F2"),
+        currency: 'USD',
+        num_items: @Model.Cart.Items.Sum(i => i.Quantity)
+    });
+</script>

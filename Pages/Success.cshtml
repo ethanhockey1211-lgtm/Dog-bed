@@ -46,8 +46,6 @@
 
 @if (Model.Order != null)
 {
-    <text>
-    @section Scripts {
     <script>
         fbq('track', 'Purchase', {
             value: @Model.Order.AmountPaid.ToString("F2"),
@@ -55,6 +53,4 @@
             content_type: 'product'
         });
     </script>
-    }
-    </text>
 }
