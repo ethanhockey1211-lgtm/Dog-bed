@@ -49,6 +49,41 @@ public class ProductService
                     new Review { Author = "Priya K.", Stars = 5, Comment = "Got the M for my corgi — perfect fit! The fabric is incredibly soft and it washed beautifully in the machine. 10/10.", Date = "April 3, 2025", VerifiedPurchase = "M - Gray" },
                     new Review { Author = "Mike R.", Stars = 4, Comment = "Really nice bed, my dogs fight over it now. Docking one star because delivery took a bit longer than expected, but the product itself is great.", Date = "March 19, 2025", VerifiedPurchase = "XL - Gray" },
                 }
+            },
+            new Product
+            {
+                Id = 2,
+                Name = "PET HEAVEN Self-Cleaning Grooming Brush",
+                ShortDescription = "One-click hair removal with bent needle massaging comb — for dogs & cats of all sizes.",
+                Description = "Keep your pet's coat clean and healthy with the PET HEAVEN grooming brush. The bent needle design gently massages skin while removing loose fur, and the one-click button ejects collected hair instantly. Works on all coat types.",
+                Rating = 4.8,
+                ReviewCount = 21,
+                Features = new List<string>
+                {
+                    "One-click self-cleaning button",
+                    "Bent needle massaging comb",
+                    "Gentle on skin — works on all coat types",
+                    "Ergonomic anti-slip handle",
+                    "Removes loose fur, tangles & dander",
+                    "Suitable for dogs & cats"
+                },
+                Images = new List<string>
+                {
+                    "/images/brush1.jpeg",
+                    "/images/brush2.jpeg",
+                    "/images/brush3.jpeg",
+                    "/images/brush4.jpeg"
+                },
+                Variants = new List<ProductVariant>
+                {
+                    new ProductVariant { Size = "One Size", DimensionsCm = "19×7 cm", DimensionsInch = "7.5×2.8 in", Price = 24.99m, OriginalPrice = 49.99m, Color = "White/Gray", Stock = 100 }
+                },
+                Reviews = new List<Review>
+                {
+                    new Review { Author = "Kelly B.", Stars = 5, Comment = "My husky sheds like crazy and this brush is a lifesaver. The one-click release makes cleanup so easy!", Date = "May 8, 2025", VerifiedPurchase = "One Size - White/Gray" },
+                    new Review { Author = "Tom W.", Stars = 5, Comment = "Works great on my golden retriever. Gets so much fur out and he actually enjoys the massage. Worth every penny.", Date = "April 20, 2025", VerifiedPurchase = "One Size - White/Gray" },
+                    new Review { Author = "Diane L.", Stars = 4, Comment = "Really solid brush. Used it on my two cats and it works perfectly. Easy to clean too.", Date = "April 5, 2025", VerifiedPurchase = "One Size - White/Gray" },
+                }
             }
         };
     }
