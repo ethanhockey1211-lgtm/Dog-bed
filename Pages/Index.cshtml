@@ -125,13 +125,13 @@
     </div>
 </section>
 
-<!-- All Products Strip -->
+<!-- Also Available Strip -->
 <section class="py-5" style="background:#f8f7f4;">
     <div class="container">
-        <h2 class="section-title text-center mb-2">Our Products</h2>
-        <p class="text-center text-muted mb-4">Free shipping on every order.</p>
+        <h2 class="section-title text-center mb-2">Also Available</h2>
+        <p class="text-center text-muted mb-4">More premium pet products — free shipping on every order.</p>
         <div class="row g-4 justify-content-center">
-            @foreach (var p in Model.AllProducts)
+            @foreach (var p in Model.AllProducts.Where(p => p.Id != 1))
             {
                 var url = p.Id == 1 ? "/" : "/Brush";
                 var img = p.Images.FirstOrDefault() ?? "/images/placeholder.svg";
