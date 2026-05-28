@@ -43,3 +43,18 @@
         </a>
     </div>
 </div>
+
+@if (Model.Order != null)
+{
+    <text>
+    @section Scripts {
+    <script>
+        fbq('track', 'Purchase', {
+            value: @Model.Order.AmountPaid.ToString("F2"),
+            currency: 'USD',
+            content_type: 'product'
+        });
+    </script>
+    }
+    </text>
+}

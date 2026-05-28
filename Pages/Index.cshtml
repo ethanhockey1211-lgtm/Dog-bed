@@ -436,6 +436,15 @@
             const toast = new bootstrap.Toast(document.getElementById('cartToast'));
             toast.show();
             refreshCartBadge();
+            const size = document.getElementById('formSize').value;
+            const v = variantData.find(x => x.size === size);
+            fbq('track', 'AddToCart', {
+                content_name: '@product.Name',
+                content_ids: ['@product.Id'],
+                content_type: 'product',
+                value: v ? v.price : @variants.First().Price.ToString("F2"),
+                currency: 'USD'
+            });
         }
     }
 
