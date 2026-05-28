@@ -15,10 +15,12 @@ public class IndexModel : PageModel
     }
 
     public Product? Product { get; set; }
+    public List<Product> AllProducts { get; set; } = [];
 
     public void OnGet()
     {
         Product = _productService.GetById(1);
+        AllProducts = _productService.GetAll();
     }
 
     public IActionResult OnPostAddToCart(int productId, string size, int quantity)

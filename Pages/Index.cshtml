@@ -125,6 +125,45 @@
     </div>
 </section>
 
+<!-- All Products Strip -->
+<section class="py-5" style="background:#f8f7f4;">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Our Products</h2>
+        <p class="text-center text-muted mb-4">Free shipping on every order.</p>
+        <div class="row g-4 justify-content-center">
+            @foreach (var p in Model.AllProducts)
+            {
+                var url = p.Id == 1 ? "/" : "/Brush";
+                var img = p.Images.FirstOrDefault() ?? "/images/placeholder.svg";
+                var priceLabel = p.Variants.Count == 1
+                    ? $"${p.Variants[0].Price:F2}"
+                    : $"From ${p.Variants.Min(v => v.Price):F2}";
+                <div class="col-sm-6 col-lg-4">
+                    <a href="@url" class="text-decoration-none">
+                        <div class="shop-card">
+                            <div class="shop-card-img">
+                                <img src="@img" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
+                            </div>
+                            <div class="shop-card-body">
+                                <div class="d-flex align-items-center gap-1 mb-1">
+                                    @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning" style="font-size:.7rem"></i> }
+                                    <span class="text-muted small ms-1">(@p.ReviewCount)</span>
+                                </div>
+                                <h6 class="shop-card-title">@p.Name</h6>
+                                <p class="shop-card-desc">@p.ShortDescription</p>
+                                <div class="d-flex align-items-center justify-content-between mt-3">
+                                    <span class="shop-card-price">@priceLabel</span>
+                                    <span class="btn btn-buy-now btn-sm px-3 py-2" style="font-size:.82rem">Shop Now</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
 <!-- Features -->
 <section class="features-section py-5 bg-light" id="features">
     <div class="container">
