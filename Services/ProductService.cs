@@ -107,10 +107,10 @@ public class ProductService
                 },
                 Images = new List<string>
                 {
-                    "/images/paw1.jpeg",
-                    "/images/paw2.jpeg",
-                    "/images/paw3.jpeg",
-                    "/images/paw4.jpeg"
+                    "/images/1 (1).jpeg",
+                    "/images/1 (2).jpeg",
+                    "/images/1 (3).jpeg",
+                    "/images/1 (4).jpeg"
                 },
                 Variants = new List<ProductVariant>
                 {
