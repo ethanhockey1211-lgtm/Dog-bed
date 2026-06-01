@@ -86,8 +86,44 @@ public class ProductService
                     new Review { Author = "Tom W.", Stars = 5, Comment = "Works great on my golden retriever. Gets so much fur out and he actually enjoys the massage. Worth every penny.", Date = "April 20, 2025", VerifiedPurchase = "One Size - White/Gray" },
                     new Review { Author = "Diane L.", Stars = 4, Comment = "Really solid brush. Used it on my two cats and it works perfectly. Easy to clean too.", Date = "April 5, 2025", VerifiedPurchase = "One Size - White/Gray" },
                 }
+            },
+            new Product
+            {
+                Id = 3,
+                Name = "PET HEAVEN Paw Butter Balm",
+                ShortDescription = "Heal cracked, sore paws in days — all-natural coconut oil formula that moisturizes, protects & repairs.",
+                Description = "Your dog walks on every surface — hot pavement, icy sidewalks, rough trails. Over time, paw pads crack, dry out, and become painful. PET HEAVEN Paw Butter uses a rich coconut botanical oil blend to deeply moisturize, heal cracks, and form a protective barrier with every use. 100% pet-safe — licking is totally fine.",
+                Rating = 4.9,
+                ReviewCount = 36,
+                Features = new List<string>
+                {
+                    "Heals cracked & dry paw pads in 3–5 days",
+                    "100% natural coconut & botanical oil blend",
+                    "Pet-safe formula — completely non-toxic if licked",
+                    "Protects against hot pavement, snow, salt & ice",
+                    "Easy no-mess twist-up stick applicator",
+                    "Works on dogs of all breeds and sizes",
+                    "Visible results guaranteed or your money back"
+                },
+                Images = new List<string>
+                {
+                    "/images/paw1.jpeg",
+                    "/images/paw2.jpeg",
+                    "/images/paw3.jpeg",
+                    "/images/paw4.jpeg"
+                },
+                Variants = new List<ProductVariant>
+                {
+                    new ProductVariant { Size = "One Size", DimensionsCm = "30g / 1 oz", DimensionsInch = "30g / 1 oz", Price = 22.00m, OriginalPrice = 44.00m, Color = "Natural", Stock = 80 }
+                },
+                Reviews = new List<Review>
+                {
+                    new Review { Author = "Amanda R.", Stars = 5, Comment = "My golden's paws were so cracked they were bleeding. After 3 days of this paw butter, completely healed. I literally cried. Best $22 I've ever spent.", Date = "May 18, 2025", VerifiedPurchase = "One Size - Natural" },
+                    new Review { Author = "Chris L.", Stars = 5, Comment = "My vet recommended paw balm after winter salt destroyed my lab's pads. This stuff is incredible — his paws look brand new after one week. 10/10.", Date = "May 2, 2025", VerifiedPurchase = "One Size - Natural" },
+                    new Review { Author = "Jen M.", Stars = 5, Comment = "Skeptical at first but WOW. The coconut scent is amazing and my dog actually looks forward to paw time now. Huge improvement in just days.", Date = "April 15, 2025", VerifiedPurchase = "One Size - Natural" },
+                    new Review { Author = "Pat D.", Stars = 5, Comment = "My elderly beagle's paws were always dry and cracking. This changed everything. Easy to apply and she doesn't mind it at all. Will buy again.", Date = "April 1, 2025", VerifiedPurchase = "One Size - Natural" },
+                }
             }
-        };
     }
 
     public Product? GetById(int id) => _products.FirstOrDefault(p => p.Id == id);
