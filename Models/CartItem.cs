@@ -9,6 +9,7 @@ public class CartItem
     public string DimensionsCm { get; set; } = "";
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
+    public string Image { get; set; } = "/images/placeholder.svg";
     public decimal LineTotal => UnitPrice * Quantity;
 }
 

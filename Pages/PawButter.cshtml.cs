@@ -37,7 +37,8 @@ public class PawButterModel : PageModel
             Color = variant.Color,
             DimensionsCm = variant.DimensionsCm,
             UnitPrice = variant.Price,
-            Quantity = quantity
+            Quantity = quantity,
+            Image = product.Images.FirstOrDefault() ?? "/images/placeholder.svg"
         };
 
         CartService.AddItem(HttpContext.Session, item);
