@@ -21,13 +21,13 @@ public class ShopModel : PageModel
                 ? $"${p.Variants[0].Price:F2}"
                 : $"From ${p.Variants.Min(v => v.Price):F2}",
             ReviewCount  = p.ReviewCount,
-            Url          = p.Id == 1 ? "/" : $"/{GetSlug(p.Name)}"
+            Url          = $"/{GetSlug(p.Name)}"
         }).ToList();
     }
 
     private static string GetSlug(string name) =>
         name.ToLower().Contains("brush") ? "Brush" :
-        name.ToLower().Contains("paw") ? "PawButter" : "Index";
+        name.ToLower().Contains("paw") ? "PawButter" : "DogBed";
 }
 
 public class ShopItem

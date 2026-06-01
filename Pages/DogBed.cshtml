@@ -1,0 +1,406 @@
+@page
+@model DogBedModel
+@{
+    ViewData["Title"] = "PET HEAVEN Super Sized Dog Bed";
+    var product = Model.Product!;
+    var variants = product.Variants;
+    var deliveryStart = DateTime.Now.AddDays(5).ToString("MMMM d");
+    var deliveryEnd = DateTime.Now.AddDays(12).ToString("MMMM d");
+}
+
+<!-- Hero / Product Section -->
+<section class="product-section py-5">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+
+            <!-- Image Gallery -->
+            <div class="col-lg-6">
+                <div class="product-gallery">
+                    <div id="mainImage" class="main-image-wrapper">
+                        <img id="mainImg" src="/images/IMG_1046.jpeg" alt="PET HEAVEN Dog Bed"
+                             onerror="this.src='/images/placeholder.svg'" />
+                    </div>
+                    <div class="thumbnail-row mt-3">
+                        <button class="thumb-btn active" onclick="setImage('/images/IMG_1046.jpeg', this)">
+                            <img src="/images/IMG_1046.jpeg" alt="Golden retriever in bed" onerror="this.src='/images/placeholder.svg'" />
+                        </button>
+                        <button class="thumb-btn" onclick="setImage('/images/IMG_1047.jpeg', this)">
+                            <img src="/images/IMG_1047.jpeg" alt="Corgi in bed" onerror="this.src='/images/placeholder.svg'" />
+                        </button>
+                        <button class="thumb-btn" onclick="setImage('/images/IMG_1048.jpeg', this)">
+                            <img src="/images/IMG_1048.jpeg" alt="Washable" onerror="this.src='/images/placeholder.svg'" />
+                        </button>
+                        <button class="thumb-btn" onclick="setImage('/images/IMG_1049.jpeg', this)">
+                            <img src="/images/IMG_1049.jpeg" alt="Size guide" onerror="this.src='/images/placeholder.svg'" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <div class="product-info">
+
+                    <div class="rating-row mb-2">
+                        @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning"></i> }
+                        <span class="ms-2 fw-semibold">@product.Rating</span>
+                        <span class="text-muted ms-1">(@product.ReviewCount reviews)</span>
+                    </div>
+
+                    <h1 class="product-title">@product.Name</h1>
+                    <p class="product-short-desc">@product.ShortDescription</p>
+
+                    <div class="price-block" id="priceBlock">
+                        <span class="sale-price" id="salePrice">$@variants.First().Price.ToString("F2")</span>
+                    </div>
+
+                    <div class="mt-2 mb-3" style="font-size:.85rem;color:#555;">
+                        <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
+                    </div>
+
+                    <hr />
+
+                    <!-- Size Selector -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="selector-label">Size: <strong id="selectedSize">S</strong></label>
+                            <a href="#sizeGuide" class="size-guide-link">Size guide <i class="bi bi-rulers"></i></a>
+                        </div>
+                        <div class="size-buttons" id="sizeButtons">
+                            @foreach (var v in variants)
+                            {
+                                <button class="size-btn @(v.Size == "S" ? "active" : "")"
+                                        data-size="@v.Size"
+                                        data-price="@v.Price"
+                                        data-dims="@v.DimensionsCm"
+                                        onclick="selectSize(this)">
+                                    @v.Size
+                                    <span class="size-dims">@v.DimensionsCm</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="mb-4">
+                        <label class="selector-label mb-2">Quantity</label>
+                        <div class="qty-control">
+                            <button onclick="changeQty(-1)"><i class="bi bi-dash"></i></button>
+                            <input type="number" id="qty" value="1" min="1" max="99" readonly />
+                            <button onclick="changeQty(1)"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="cta-buttons mb-3">
+                        <button class="btn btn-add-cart w-100 mb-2" onclick="addToCart()">
+                            <i class="bi bi-bag-plus me-2"></i>Add to Cart
+                        </button>
+                        <a asp-page="/Checkout" class="btn btn-buy-now w-100" id="buyNowBtn" onclick="return buyNow(event)">
+                            <i class="bi bi-lightning-fill me-2"></i>Buy It Now
+                        </a>
+                    </div>
+
+                    <!-- Guarantee -->
+                    <div class="mb-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:.85rem;">
+                        <strong style="color:#15803d;">30-Day Money-Back Guarantee</strong><br />
+                        <span style="color:#555;">If your dog doesn't love it, we'll refund you in full — no questions asked.</span>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-item"><i class="bi bi-truck"></i><span>Free shipping, always</span></div>
+                        <div class="trust-item"><i class="bi bi-arrow-counterclockwise"></i><span>30-day returns</span></div>
+                        <div class="trust-item"><i class="bi bi-shield-lock"></i><span>Secure payment</span></div>
+                        <div class="trust-item"><i class="bi bi-award"></i><span>Premium quality</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features-section py-5 bg-light" id="features">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Why Dogs Love It</h2>
+        <p class="text-center text-muted mb-5 section-sub">Everything your pup needs for the perfect night's sleep.</p>
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-cloud-sun"></i></div>
+                    <h6>Ultra Soft</h6>
+                    <p>Corduroy velvet lining keeps your pet cozy all night long.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-droplet-half"></i></div>
+                    <h6>Dirt Resistant</h6>
+                    <p>Water-resistant exterior repels spills and messes easily.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div>
+                    <h6>Fully Washable</h6>
+                    <p>Removable cover is machine washable — always fresh and clean.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-layers"></i></div>
+                    <h6>Non-Slip Base</h6>
+                    <p>Rubberized bottom grips any floor surface, even hardwood.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h6>Deep Bolster</h6>
+                    <p>Raised sides give your dog a sense of security and warmth.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-house-heart"></i></div>
+                    <h6>Indoor & Outdoor</h6>
+                    <p>Works beautifully in living rooms, bedrooms, and patios.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-rulers"></i></div>
+                    <h6>4 Sizes</h6>
+                    <p>From small dogs to giant breeds — we have the perfect fit.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-currency-dollar"></i></div>
+                    <h6>Great Value</h6>
+                    <p>Premium materials at a fraction of the boutique price.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Size Guide -->
+<section class="py-5" id="sizeGuide">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Size Guide</h2>
+        <p class="text-center text-muted mb-5 section-sub">Find the perfect fit for your dog.</p>
+        <div class="table-responsive size-table-wrapper mx-auto" style="max-width:700px">
+            <table class="table size-table text-center">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        <th>Dimensions (cm)</th>
+                        <th>Dimensions (inch)</th>
+                        <th>Best For</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in variants)
+                    {
+                        <tr>
+                            <td><strong>@v.Size</strong></td>
+                            <td>@v.DimensionsCm</td>
+                            <td>@v.DimensionsInch</td>
+                            <td>@(v.Size == "S" ? "Small breeds" : v.Size == "M" ? "Medium breeds" : v.Size == "L" ? "Large breeds" : "Giant breeds")</td>
+                            <td><strong class="text-primary">$@v.Price</strong></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="text-center text-muted small mt-3">
+            <i class="bi bi-info-circle me-1"></i>
+            We recommend sizing up if your dog likes to stretch out.
+        </p>
+    </div>
+</section>
+
+<!-- Reviews -->
+<section class="reviews-section py-5 bg-light" id="reviews">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title mb-2">What Dog Owners Say</h2>
+            <div class="d-flex justify-content-center align-items-center gap-2 mt-2">
+                @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning fs-5"></i> }
+                <span class="fw-bold fs-5 ms-2">@product.Rating / 5</span>
+                <span class="text-muted">(@product.ReviewCount verified reviews)</span>
+            </div>
+        </div>
+        <div class="row g-4">
+            @foreach (var review in product.Reviews)
+            {
+                <div class="col-md-6">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">@review.Author[0]</div>
+                            <div>
+                                <div class="fw-semibold">@review.Author</div>
+                                <div class="text-muted small">@review.Date · @review.VerifiedPurchase</div>
+                            </div>
+                            <div class="ms-auto">
+                                @for (int i = 1; i <= 5; i++)
+                                { <i class="bi bi-star-fill @(i <= review.Stars ? "text-warning" : "text-muted")"></i> }
+                            </div>
+                        </div>
+                        <p class="review-text mt-3 mb-0">@review.Comment</p>
+                        <div class="mt-2">
+                            <span class="verified-badge"><i class="bi bi-patch-check-fill me-1"></i>Verified Purchase</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-5" id="faq">
+    <div class="container" style="max-width: 760px;">
+        <h2 class="section-title text-center mb-5">Frequently Asked Questions</h2>
+        <div class="accordion faq-accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        How do I wash the bed?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Simply unzip and remove the soft inner cover. Machine wash on a gentle cycle with cold water and tumble dry on low. The outer shell can be spot-cleaned with a damp cloth.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Which size should I choose?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Measure your dog from nose to tail while sleeping in their natural curled position. Choose a size where that measurement fits comfortably, or size up if your dog loves to stretch.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        How long does shipping take?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Standard shipping takes 5–10 business days. Free shipping on every order.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        What is your return policy?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        We offer a 30-day money-back guarantee. If your pet doesn't love it, contact us and we'll refund you in full.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Toast notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast align-items-center border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-bag-check-fill me-2 text-success"></i>
+                Added to cart!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<form id="addToCartForm" method="post" asp-page-handler="AddToCart" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="productId" value="@product.Id" />
+    <input type="hidden" name="size" id="formSize" value="S" />
+    <input type="hidden" name="quantity" id="formQty" value="1" />
+</form>
+
+@section Scripts {
+<script>
+    const variantData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        product.Variants.Select(v => new {
+            size = v.Size,
+            price = v.Price,
+            dimensionsCm = v.DimensionsCm
+        })
+    ));
+
+    function selectSize(btn) {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const size = btn.dataset.size;
+        document.getElementById('selectedSize').textContent = size;
+        document.getElementById('formSize').value = size;
+        const v = variantData.find(x => x.size === size);
+        if (v) document.getElementById('salePrice').textContent = '$' + v.price.toFixed(2);
+    }
+
+    function changeQty(delta) {
+        const input = document.getElementById('qty');
+        const newVal = Math.max(1, parseInt(input.value) + delta);
+        input.value = newVal;
+        document.getElementById('formQty').value = newVal;
+    }
+
+    function setImage(src, btn) {
+        document.getElementById('mainImg').src = src;
+        document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    async function addToCart() {
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST', body: formData,
+            headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
+        });
+        if (response.ok) {
+            new bootstrap.Toast(document.getElementById('cartToast')).show();
+            refreshCartBadge();
+            const size = document.getElementById('formSize').value;
+            const v = variantData.find(x => x.size === size);
+            fbq('track', 'AddToCart', {
+                content_name: '@product.Name', content_ids: ['@product.Id'],
+                content_type: 'product',
+                value: v ? v.price : @variants.First().Price.ToString("F2"),
+                currency: 'USD'
+            });
+        }
+    }
+
+    async function buyNow(e) {
+        e.preventDefault();
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST', body: formData,
+            headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
+        });
+        if (response.ok) window.location.href = '/Checkout';
+    }
+</script>
+}
