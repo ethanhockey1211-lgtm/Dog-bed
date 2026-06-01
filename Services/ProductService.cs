@@ -124,6 +124,7 @@ public class ProductService
                     new Review { Author = "Pat D.", Stars = 5, Comment = "My elderly beagle's paws were always dry and cracking. This changed everything. Easy to apply and she doesn't mind it at all. Will buy again.", Date = "April 1, 2025", VerifiedPurchase = "One Size - Natural" },
                 }
             }
+        };
     }
 
     public Product? GetById(int id) => _products.FirstOrDefault(p => p.Id == id);
