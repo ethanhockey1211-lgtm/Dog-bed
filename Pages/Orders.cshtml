@@ -72,8 +72,8 @@ else
                                     @foreach (var item in o.Items)
                                     {
                                         <div class="small">
-                                            <strong>@item.Size</strong> × @item.Quantity
-                                            <span class="text-muted">(@item.DimensionsCm)</span>
+                                            <strong>@item.ProductName</strong><br/>
+                                            <span class="text-muted">@item.Size · @item.Color · qty @item.Quantity — $@item.LineTotal.ToString("F2")</span>
                                         </div>
                                     }
                                 </td>

@@ -20,7 +20,7 @@ public class EmailService
     public async Task SendOrderNotificationAsync(FulfillmentOrder order)
     {
         var items = string.Join("\n", order.Items.Select(i =>
-            $"  • Size {i.Size} ({i.DimensionsCm}) x{i.Quantity} — ${i.LineTotal:F2}"));
+            $"  • {i.ProductName} — {i.Size} x{i.Quantity} — ${i.LineTotal:F2}"));
 
         await SendAsync(
             to: _config["Email:NotifyTo"] ?? "",
@@ -55,7 +55,11 @@ public class EmailService
 
         var firstName = order.CustomerName.Split(' ')[0];
         var items = string.Join("\n", order.Items.Select(i =>
-            $"  • Size {i.Size} x{i.Quantity} — ${i.LineTotal:F2}"));
+            $"  • {i.ProductName} — {i.Size} x{i.Quantity} — ${i.LineTotal:F2}"));
+
+        var productSummary = order.Items.Count == 1
+            ? order.Items[0].ProductName
+            : $"{order.Items.Count} items";
 
         await SendAsync(
             to: order.CustomerEmail,
@@ -63,7 +67,7 @@ public class EmailService
             body: $"""
                 Hi {firstName},
 
-                Thank you for your order! Your PET HEAVEN dog bed is on its way.
+                Thank you for your order! Your {productSummary} is on its way.
 
                 ORDER SUMMARY
                 ══════════════════════════════════
