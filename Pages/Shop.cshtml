@@ -14,8 +14,12 @@
             <div class="col-sm-6 col-lg-4">
                 <a href="@p.Url" class="text-decoration-none">
                     <div class="shop-card">
-                        <div class="shop-card-img">
+                        <div class="shop-card-img" style="position:relative">
                             <img src="@p.Image" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
+                            @if (p.DiscountPct > 0)
+                            {
+                                <span class="card-sale-badge">@p.DiscountPct% OFF</span>
+                            }
                         </div>
                         <div class="shop-card-body">
                             <div class="d-flex align-items-center gap-1 mb-1">
@@ -28,7 +32,13 @@
                             <h6 class="shop-card-title">@p.Name</h6>
                             <p class="shop-card-desc">@p.ShortDescription</p>
                             <div class="d-flex align-items-center justify-content-between mt-3">
-                                <span class="shop-card-price">@p.PriceLabel</span>
+                                <div>
+                                    <span class="shop-card-price">@p.PriceLabel</span>
+                                    @if (!string.IsNullOrEmpty(p.OriginalPriceLabel))
+                                    {
+                                        <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">@p.OriginalPriceLabel</span>
+                                    }
+                                </div>
                                 <span class="btn btn-buy-now btn-sm px-3 py-2" style="font-size:.82rem">Shop Now</span>
                             </div>
                         </div>

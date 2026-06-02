@@ -11,8 +11,13 @@
         <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:16px;line-height:1.2;">
             Your Pet Deserves the Best
         </h1>
-        <p style="font-size:1.1rem;opacity:.85;max-width:520px;margin:0 auto 32px;">
+        <p style="font-size:1.1rem;opacity:.85;max-width:520px;margin:0 auto 16px;">
             Hand-picked, premium-quality products for dogs and cats. Free shipping on every single order.
+        </p>
+        <p style="font-size:.92rem;opacity:.75;margin-bottom:32px;">
+            <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:4px 14px;">
+                🔥 Sale — up to 70% off, today only
+            </span>
         </p>
         <a asp-page="/Shop" class="btn btn-buy-now px-5 py-3" style="font-size:1rem;">
             Shop All Products <i class="bi bi-arrow-right ms-2"></i>
@@ -38,11 +43,19 @@
                 var priceLabel = p.Variants.Count == 1
                     ? $"${p.Variants[0].Price:F2}"
                     : $"From ${p.Variants.Min(v => v.Price):F2}";
+                var origPriceLabel = p.Variants.Count == 1
+                    ? $"${p.Variants[0].OriginalPrice:F2}"
+                    : $"From ${p.Variants.Min(v => v.OriginalPrice):F2}";
+                var discountPct = (int)Math.Round((1 - p.Variants.Min(v => v.Price) / p.Variants.Min(v => v.OriginalPrice)) * 100);
                 <div class="col-sm-6 col-lg-4">
                     <a href="@url" class="text-decoration-none">
                         <div class="shop-card">
-                            <div class="shop-card-img">
+                            <div class="shop-card-img" style="position:relative">
                                 <img src="@img" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
+                                @if (discountPct > 0)
+                                {
+                                    <span class="card-sale-badge">@discountPct% OFF</span>
+                                }
                             </div>
                             <div class="shop-card-body">
                                 <div class="d-flex align-items-center gap-1 mb-1">
@@ -52,7 +65,10 @@
                                 <h6 class="shop-card-title">@p.Name</h6>
                                 <p class="shop-card-desc">@p.ShortDescription</p>
                                 <div class="d-flex align-items-center justify-content-between mt-3">
-                                    <span class="shop-card-price">@priceLabel</span>
+                                    <div>
+                                        <span class="shop-card-price">@priceLabel</span>
+                                        <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">@origPriceLabel</span>
+                                    </div>
                                     <span class="btn btn-buy-now btn-sm px-3 py-2" style="font-size:.82rem">Shop Now</span>
                                 </div>
                             </div>
