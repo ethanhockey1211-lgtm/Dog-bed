@@ -144,11 +144,11 @@ public class ProductService
                 },
                 Images = new List<string>
                 {
-                    "/images/dogshower1.jpeg",
-                    "/images/dogshower2.jpeg",
-                    "/images/dogshower3.jpeg",
                     "/images/dogshower4.jpeg",
-                    "/images/dogshower5.jpeg"
+                    "/images/dogshower2.jpeg",
+                    "/images/dogshower5.jpeg",
+                    "/images/dogshower3.jpeg",
+                    "/images/dogshower1.jpeg"
                 },
                 Variants = new List<ProductVariant>
                 {
