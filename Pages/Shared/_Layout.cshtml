@@ -31,9 +31,9 @@
 
     <!-- Announcement bar -->
     <div class="announcement-bar">
+        <i class="bi bi-fire me-2" style="color:#f97316;"></i><strong>SALE — Up to 70% OFF</strong> &nbsp;|&nbsp;
         <i class="bi bi-truck me-2"></i>Free shipping on all orders &nbsp;|&nbsp;
-        <i class="bi bi-arrow-repeat me-2"></i>30-day returns &nbsp;|&nbsp;
-        <i class="bi bi-shield-check me-2"></i>Secure checkout
+        <i class="bi bi-arrow-repeat me-2"></i>30-day free returns
     </div>
 
     <!-- Navbar -->
@@ -69,7 +69,6 @@
         @RenderBody()
     </main>
 
-    <!-- Footer -->
     <footer class="site-footer mt-5">
         <div class="container">
             <div class="row g-4">
@@ -117,7 +116,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
-        // Update cart badge from session storage
         function refreshCartBadge() {
             fetch('/api/cart/count')
                 .then(r => r.json())
