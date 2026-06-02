@@ -46,11 +46,19 @@
 
 @if (Model.Order != null)
 {
+    var contents = Model.Order.Items.Select(i => new {
+        id = i.ProductId.ToString(),
+        quantity = i.Quantity,
+        item_price = i.UnitPrice
+    });
     <script>
         fbq('track', 'Purchase', {
             value: @Model.Order.AmountPaid.ToString("F2"),
             currency: 'USD',
-            content_type: 'product'
+            content_type: 'product',
+            content_ids: [@string.Join(",", Model.Order.Items.Select(i => $"'{i.ProductId}'"))],
+            contents: @System.Text.Json.JsonSerializer.Serialize(contents),
+            num_items: @Model.Order.Items.Sum(i => i.Quantity)
         });
     </script>
 }
