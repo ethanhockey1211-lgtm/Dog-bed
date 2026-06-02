@@ -5,6 +5,8 @@
     var product = Model.Product!;
     var variants = product.Variants;
     var firstImage = product.Images.First();
+    var deliveryStart = DateTime.Now.AddDays(5).ToString("MMMM d");
+    var deliveryEnd = DateTime.Now.AddDays(12).ToString("MMMM d");
 }
 
 <!-- Hero / Product Section -->
@@ -33,7 +35,14 @@
             <!-- Product Info -->
             <div class="col-lg-6">
                 <div class="product-info">
-                    <div class="rating-row mb-2">
+
+                        <div class="mb-2">
+                            <span style="background:#fff3cd;color:#856404;font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:20px;display:inline-block;">
+                                🔥 50% OFF — Limited Time Sale
+                            </span>
+                        </div>
+
+                        <div class="rating-row mb-2">
                         @for (int i = 1; i <= 5; i++)
                         {
                             <i class="bi bi-star-fill text-warning"></i>
@@ -47,6 +56,15 @@
 
                     <div class="price-block">
                         <span class="sale-price">$@variants.First().Price.ToString("F2")</span>
+                        <span style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@variants.First().OriginalPrice.ToString("F2")</span>
+                        <span style="background:#e8f5e9;color:#2e7d32;font-size:.8rem;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px;">SAVE 50%</span>
+                    </div>
+
+                    <div class="mt-2 mb-1" style="font-size:.85rem;color:#555;">
+                        <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
+                    </div>
+                    <div class="mb-3" style="font-size:.82rem;color:#c0392b;font-weight:600;">
+                        <i class="bi bi-fire me-1"></i> Low stock — selling fast
                     </div>
 
                     <hr />
@@ -69,6 +87,12 @@
                         <a asp-page="/Checkout" class="btn btn-buy-now w-100" onclick="return buyNow(event)">
                             <i class="bi bi-lightning-fill me-2"></i>Buy It Now
                         </a>
+                    </div>
+
+                    <!-- Guarantee -->
+                    <div class="mb-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:.85rem;">
+                        <strong style="color:#15803d;">30-Day Money-Back Guarantee</strong><br />
+                        <span style="color:#555;">If you're not completely satisfied, we'll refund you in full — no questions asked.</span>
                     </div>
 
                     <!-- Features list -->
@@ -130,6 +154,14 @@
                 </div>
             }
         </div>
+
+        <div class="text-center mt-5">
+            <p class="fw-semibold fs-5 mb-3">Make grooming time something you both enjoy.</p>
+            <a asp-page="/Checkout" class="btn btn-buy-now px-5 py-3 fs-5" onclick="return quickBuy(event)">
+                <i class="bi bi-lightning-fill me-2"></i>Get It Now — $24.99 Free Shipping
+            </a>
+            <p class="text-muted small mt-2">30-day money-back guarantee. Risk free.</p>
+        </div>
     </div>
 </section>
 
@@ -190,6 +222,12 @@
         const response = await fetch(form.action, { method: 'POST', body: formData,
             headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') } });
         if (response.ok) window.location.href = '/Checkout';
+    }
+
+    async function quickBuy(e) {
+        e.preventDefault();
+        document.getElementById('formQty').value = 1;
+        await buyNow(e);
     }
 </script>
 }

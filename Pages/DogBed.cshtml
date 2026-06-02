@@ -41,6 +41,12 @@
             <div class="col-lg-6">
                 <div class="product-info">
 
+                    <div class="mb-2">
+                        <span style="background:#fff3cd;color:#856404;font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:20px;display:inline-block;">
+                            🔥 70% OFF — Limited Time Sale
+                        </span>
+                    </div>
+
                     <div class="rating-row mb-2">
                         @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning"></i> }
                         <span class="ms-2 fw-semibold">@product.Rating</span>
@@ -52,10 +58,15 @@
 
                     <div class="price-block" id="priceBlock">
                         <span class="sale-price" id="salePrice">$@variants.First().Price.ToString("F2")</span>
+                        <span id="origPrice" style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@variants.First().OriginalPrice.ToString("F2")</span>
+                        <span id="saveBadge" style="background:#e8f5e9;color:#2e7d32;font-size:.8rem;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px;">SAVE 70%</span>
                     </div>
 
-                    <div class="mt-2 mb-3" style="font-size:.85rem;color:#555;">
+                    <div class="mt-2 mb-1" style="font-size:.85rem;color:#555;">
                         <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
+                    </div>
+                    <div class="mb-3" style="font-size:.82rem;color:#c0392b;font-weight:600;">
+                        <i class="bi bi-fire me-1"></i> Low stock — selling fast
                     </div>
 
                     <hr />
@@ -258,6 +269,14 @@
                 </div>
             }
         </div>
+
+        <div class="text-center mt-5">
+            <p class="fw-semibold fs-5 mb-3">Your dog has waited long enough — treat them today.</p>
+            <a asp-page="/Checkout" class="btn btn-buy-now px-5 py-3 fs-5" onclick="return quickBuy(event)">
+                <i class="bi bi-lightning-fill me-2"></i>Get It Now — From $35.00 Free Shipping
+            </a>
+            <p class="text-muted small mt-2">30-day money-back guarantee. Risk free.</p>
+        </div>
     </div>
 </section>
 
@@ -344,6 +363,7 @@
         product.Variants.Select(v => new {
             size = v.Size,
             price = v.Price,
+            originalPrice = v.OriginalPrice,
             dimensionsCm = v.DimensionsCm
         })
     ));
@@ -355,7 +375,12 @@
         document.getElementById('selectedSize').textContent = size;
         document.getElementById('formSize').value = size;
         const v = variantData.find(x => x.size === size);
-        if (v) document.getElementById('salePrice').textContent = '$' + v.price.toFixed(2);
+        if (v) {
+            document.getElementById('salePrice').textContent = '$' + v.price.toFixed(2);
+            document.getElementById('origPrice').textContent = '$' + v.originalPrice.toFixed(2);
+            const pct = Math.round((1 - v.price / v.originalPrice) * 100);
+            document.getElementById('saveBadge').textContent = 'SAVE ' + pct + '%';
+        }
     }
 
     function changeQty(delta) {
@@ -401,6 +426,12 @@
             headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
         });
         if (response.ok) window.location.href = '/Checkout';
+    }
+
+    async function quickBuy(e) {
+        e.preventDefault();
+        document.getElementById('formQty').value = 1;
+        await buyNow(e);
     }
 </script>
 }
