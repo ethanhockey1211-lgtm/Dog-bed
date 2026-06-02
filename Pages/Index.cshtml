@@ -33,7 +33,7 @@
         <div class="row g-4 justify-content-center">
             @foreach (var p in Model.AllProducts)
             {
-                var url = p.Id == 1 ? "/DogBed" : p.Id == 2 ? "/Brush" : "/PawButter";
+                var url = p.Id == 1 ? "/DogBed" : p.Id == 2 ? "/Brush" : p.Id == 3 ? "/PawButter" : "/BathBrush";
                 var img = p.Images.FirstOrDefault() ?? "/images/placeholder.svg";
                 var priceLabel = p.Variants.Count == 1
                     ? $"${p.Variants[0].Price:F2}"

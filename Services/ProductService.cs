@@ -123,6 +123,44 @@ public class ProductService
                     new Review { Author = "Jen M.", Stars = 5, Comment = "Skeptical at first but WOW. The coconut scent is amazing and my dog actually looks forward to paw time now. Huge improvement in just days.", Date = "April 15, 2025", VerifiedPurchase = "One Size - Natural" },
                     new Review { Author = "Pat D.", Stars = 5, Comment = "My elderly beagle's paws were always dry and cracking. This changed everything. Easy to apply and she doesn't mind it at all. Will buy again.", Date = "April 1, 2025", VerifiedPurchase = "One Size - Natural" },
                 }
+            },
+            new Product
+            {
+                Id = 4,
+                Name = "PET HEAVEN 2-in-1 Dog Bath Brush",
+                ShortDescription = "Built-in soap dispenser + soft silicone massage bristles — bath time made easy for you and your dog.",
+                Description = "Bath time just got a whole lot easier. The PET HEAVEN Bath Brush combines a built-in shampoo dispenser with ultra-soft silicone bristles that lather, massage, and clean all at once — no more fumbling with bottles mid-bath. Your dog gets a spa-quality massage while you get a stress-free wash. Works on all coat types, all breeds.",
+                Rating = 4.9,
+                ReviewCount = 28,
+                Features = new List<string>
+                {
+                    "Built-in soap dispenser — fill with shampoo, squeeze to lather",
+                    "Ultra-soft silicone bristles — gentle massage while bathing",
+                    "One-hand operation — no more dropping shampoo bottles",
+                    "Works on all coat types, dogs & cats",
+                    "Easy to clean — rinse and squeeze dry",
+                    "Ergonomic non-slip grip handle",
+                    "Available in Teal & Pink"
+                },
+                Images = new List<string>
+                {
+                    "/images/dogshower1.jpeg",
+                    "/images/dogshower2.jpeg",
+                    "/images/dogshower3.jpeg",
+                    "/images/dogshower4.jpeg",
+                    "/images/dogshower5.jpeg"
+                },
+                Variants = new List<ProductVariant>
+                {
+                    new ProductVariant { Size = "One Size", DimensionsCm = "10×8 cm", DimensionsInch = "3.9×3.1 in", Price = 20.00m, OriginalPrice = 39.99m, Color = "Teal", Stock = 100 }
+                },
+                Reviews = new List<Review>
+                {
+                    new Review { Author = "Rachel S.", Stars = 5, Comment = "This thing is genius. I fill it with shampoo, squeeze it onto my golden mid-bath and the bristles work it in perfectly. Bath time went from a nightmare to actually enjoyable. My dog loves the massage!", Date = "May 20, 2025", VerifiedPurchase = "One Size - Teal" },
+                    new Review { Author = "Dan M.", Stars = 5, Comment = "Bought this for my two labs and it's been a game changer. The dispenser holds enough shampoo for a full bath and the silicone bristles get right down to the skin. Zero fighting with shampoo bottles.", Date = "May 5, 2025", VerifiedPurchase = "One Size - Teal" },
+                    new Review { Author = "Sofia R.", Stars = 5, Comment = "My dog used to hate baths. Now she actually sits still because the bristles feel like a massage. I can't believe how much easier this made everything. Worth every penny.", Date = "April 22, 2025", VerifiedPurchase = "One Size - Pink" },
+                    new Review { Author = "Kevin L.", Stars = 4, Comment = "Really clever design and works great. Silicone bristles are super soft and the dispenser is easy to fill. Great quality for the price.", Date = "April 10, 2025", VerifiedPurchase = "One Size - Teal" },
+                }
             }
         };
     }

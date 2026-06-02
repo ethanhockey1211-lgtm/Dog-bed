@@ -1,0 +1,306 @@
+@page
+@model BathBrushModel
+@{
+    ViewData["Title"] = "PET HEAVEN 2-in-1 Dog Bath Brush";
+    var product = Model.Product!;
+    var variants = product.Variants;
+    var firstImage = product.Images.First();
+    var deliveryStart = DateTime.Now.AddDays(5).ToString("MMMM d");
+    var deliveryEnd = DateTime.Now.AddDays(12).ToString("MMMM d");
+}
+
+<section class="product-section py-5">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+
+            <!-- Image Gallery -->
+            <div class="col-lg-6">
+                <div class="product-gallery">
+                    <div id="mainImage" class="main-image-wrapper">
+                        <img id="mainImg" src="@firstImage" alt="PET HEAVEN Dog Bath Brush"
+                             onerror="this.src='/images/placeholder.svg'" />
+                    </div>
+                    <div class="thumbnail-row mt-3">
+                        @foreach (var (img, idx) in product.Images.Select((img, i) => (img, i)))
+                        {
+                            <button class="thumb-btn @(idx == 0 ? "active" : "")" onclick="setImage('@img', this)">
+                                <img src="@img" alt="Bath brush view @(idx+1)" onerror="this.src='/images/placeholder.svg'" />
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <div class="product-info">
+
+                    <div class="mb-2">
+                        <span style="background:#fff3cd;color:#856404;font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:20px;display:inline-block;">
+                            🔥 50% OFF — Limited Time Sale
+                        </span>
+                    </div>
+
+                    <div class="rating-row mb-2">
+                        @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning"></i> }
+                        <span class="ms-2 fw-semibold">@product.Rating</span>
+                        <span class="text-muted ms-1">(@product.ReviewCount reviews)</span>
+                    </div>
+
+                    <h1 class="product-title">@product.Name</h1>
+                    <p class="product-short-desc">@product.ShortDescription</p>
+
+                    <div class="price-block">
+                        <span class="sale-price">$@variants.First().Price.ToString("F2")</span>
+                        <span style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@variants.First().OriginalPrice.ToString("F2")</span>
+                        <span style="background:#e8f5e9;color:#2e7d32;font-size:.8rem;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px;">SAVE 50%</span>
+                    </div>
+
+                    <div class="mt-2 mb-3" style="font-size:.85rem;color:#555;">
+                        <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
+                    </div>
+
+                    <hr />
+
+                    <!-- Quantity -->
+                    <div class="mb-4">
+                        <label class="selector-label mb-2">Quantity</label>
+                        <div class="qty-control">
+                            <button onclick="changeQty(-1)"><i class="bi bi-dash"></i></button>
+                            <input type="number" id="qty" value="1" min="1" max="99" readonly />
+                            <button onclick="changeQty(1)"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="cta-buttons mb-3">
+                        <button class="btn btn-add-cart w-100 mb-2" onclick="addToCart()">
+                            <i class="bi bi-bag-plus me-2"></i>Add to Cart
+                        </button>
+                        <a asp-page="/Checkout" class="btn btn-buy-now w-100" onclick="return buyNow(event)">
+                            <i class="bi bi-lightning-fill me-2"></i>Buy It Now
+                        </a>
+                    </div>
+
+                    <!-- Guarantee -->
+                    <div class="mb-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:.85rem;">
+                        <strong style="color:#15803d;">30-Day Money-Back Guarantee</strong><br />
+                        <span style="color:#555;">If your dog doesn't love bath time more, we'll refund you in full — no questions asked.</span>
+                    </div>
+
+                    <!-- Features -->
+                    <ul class="list-unstyled mb-4">
+                        @foreach (var f in product.Features)
+                        {
+                            <li class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                                <i class="bi bi-check-circle-fill text-success flex-shrink-0"></i>
+                                @f
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-item"><i class="bi bi-truck"></i><span>Free shipping, always</span></div>
+                        <div class="trust-item"><i class="bi bi-arrow-counterclockwise"></i><span>30-day returns</span></div>
+                        <div class="trust-item"><i class="bi bi-shield-lock"></i><span>Secure payment</span></div>
+                        <div class="trust-item"><i class="bi bi-award"></i><span>Premium quality</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5" style="background:#f8f7f4;">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">How It Works</h2>
+        <p class="text-center text-muted mb-5">3 steps to the easiest bath your dog has ever had.</p>
+        <div class="row g-4 text-center justify-content-center">
+            <div class="col-sm-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="font-size:2rem;">🧴</div>
+                    <h6>Step 1 — Fill</h6>
+                    <p>Open the top cap and pour in your dog's shampoo. Snaps shut securely.</p>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="font-size:2rem;">🐕</div>
+                    <h6>Step 2 — Squeeze & Scrub</h6>
+                    <p>Press the sides to dispense shampoo through the bristles as you scrub.</p>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="font-size:2rem;">✨</div>
+                    <h6>Step 3 — Rinse & Done</h6>
+                    <p>Rinse your dog clean. Rinse the brush, squeeze dry, ready for next time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Why Dog Owners Love It</h2>
+        <p class="text-center text-muted mb-5">Bath time should be bonding time — not a wrestling match.</p>
+        <div class="row g-4">
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-droplet-fill"></i></div>
+                    <h6>Built-In Dispenser</h6>
+                    <p>No more fumbling with shampoo bottles mid-bath. One tool does it all.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-heart-fill"></i></div>
+                    <h6>Spa Massage</h6>
+                    <p>Soft silicone bristles feel amazing — dogs that hated baths start to enjoy them.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-hand-index-thumb"></i></div>
+                    <h6>One-Hand Operation</h6>
+                    <p>Keep one hand on your dog while the other lathers — no more chaos.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h6>Ultra-Gentle Silicone</h6>
+                    <p>Soft enough for sensitive skin, firm enough to clean deep through thick coats.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-arrow-repeat"></i></div>
+                    <h6>Easy to Clean</h6>
+                    <p>Rinse under water and squeeze dry. No bristles to clog, no mess to deal with.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="bi bi-currency-dollar"></i></div>
+                    <h6>Risk Free</h6>
+                    <p>30-day money-back guarantee. If you're not happy, we'll refund every penny.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews -->
+<section class="reviews-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title mb-2">What Dog Owners Are Saying</h2>
+            <div class="d-flex justify-content-center align-items-center gap-2 mt-2">
+                @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning fs-5"></i> }
+                <span class="fw-bold fs-5 ms-2">@product.Rating / 5</span>
+                <span class="text-muted">(@product.ReviewCount verified reviews)</span>
+            </div>
+        </div>
+        <div class="row g-4">
+            @foreach (var review in product.Reviews)
+            {
+                <div class="col-md-6">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">@review.Author[0]</div>
+                            <div>
+                                <div class="fw-semibold">@review.Author</div>
+                                <div class="text-muted small">@review.Date · @review.VerifiedPurchase</div>
+                            </div>
+                            <div class="ms-auto">
+                                @for (int i = 1; i <= 5; i++)
+                                { <i class="bi bi-star-fill @(i <= review.Stars ? "text-warning" : "text-muted")"></i> }
+                            </div>
+                        </div>
+                        <p class="review-text mt-3 mb-0">@review.Comment</p>
+                        <div class="mt-2">
+                            <span class="verified-badge"><i class="bi bi-patch-check-fill me-1"></i>Verified Purchase</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="fw-semibold fs-5 mb-3">Make bath time something you both actually enjoy.</p>
+            <a asp-page="/Checkout" class="btn btn-buy-now px-5 py-3 fs-5" onclick="return quickBuy(event)">
+                <i class="bi bi-lightning-fill me-2"></i>Get It Now — $20.00 Free Shipping
+            </a>
+            <p class="text-muted small mt-2">30-day money-back guarantee. Risk free.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast align-items-center border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body"><i class="bi bi-bag-check-fill me-2 text-success"></i>Added to cart!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<form id="addToCartForm" method="post" asp-page-handler="AddToCart" style="display:none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="productId" value="@product.Id" />
+    <input type="hidden" name="size" id="formSize" value="One Size" />
+    <input type="hidden" name="quantity" id="formQty" value="1" />
+</form>
+
+@section Scripts {
+<script>
+    function changeQty(delta) {
+        const input = document.getElementById('qty');
+        const newVal = Math.max(1, parseInt(input.value) + delta);
+        input.value = newVal;
+        document.getElementById('formQty').value = newVal;
+    }
+
+    function setImage(src, btn) {
+        document.getElementById('mainImg').src = src;
+        document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    async function addToCart() {
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const response = await fetch(form.action, { method: 'POST', body: formData,
+            headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') } });
+        if (response.ok) {
+            new bootstrap.Toast(document.getElementById('cartToast')).show();
+            refreshCartBadge();
+            fbq('track', 'AddToCart', {
+                content_name: '@product.Name', content_ids: ['@product.Id'],
+                content_type: 'product', value: @variants.First().Price.ToString("F2"), currency: 'USD'
+            });
+        }
+    }
+
+    async function buyNow(e) {
+        e.preventDefault();
+        const form = document.getElementById('addToCartForm');
+        const formData = new FormData(form);
+        const response = await fetch(form.action, { method: 'POST', body: formData,
+            headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') } });
+        if (response.ok) window.location.href = '/Checkout';
+    }
+
+    async function quickBuy(e) {
+        e.preventDefault();
+        document.getElementById('formQty').value = 1;
+        await buyNow(e);
+    }
+</script>
+}

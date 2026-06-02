@@ -26,6 +26,7 @@ public class ShopModel : PageModel
     }
 
     private static string GetSlug(string name) =>
+        name.ToLower().Contains("bath") ? "BathBrush" :
         name.ToLower().Contains("brush") ? "Brush" :
         name.ToLower().Contains("paw") ? "PawButter" : "DogBed";
 }
