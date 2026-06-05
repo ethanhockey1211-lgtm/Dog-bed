@@ -87,6 +87,7 @@ public class StripeCheckoutService
             Quantity = item.Quantity
         }).ToList();
 
+        // Pack shipping address + cart into Stripe metadata so webhook can rebuild the order
         var meta = new Dictionary<string, string>
         {
             ["FirstName"]  = shipping.FirstName,
@@ -106,11 +107,17 @@ public class StripeCheckoutService
             var it = cart.Items[i];
             meta[$"Item_{i}"] = JsonSerializer.Serialize(new
             {
-                it.ProductId, it.ProductName, it.Size,
-                it.Color, it.DimensionsCm, it.UnitPrice, it.Quantity
+                productId    = it.ProductId,
+                productName  = it.ProductName,
+                size         = it.Size,
+                color        = it.Color,
+                dimensionsCm = it.DimensionsCm,
+                unitPrice    = it.UnitPrice,
+                quantity     = it.Quantity
             });
         }
 
+        // Apply state sales tax based on shipping address
         var stateKey = shipping.State?.Trim().ToUpper() ?? "";
         if (StateTaxRates.TryGetValue(stateKey, out var taxRate) && taxRate > 0)
         {
