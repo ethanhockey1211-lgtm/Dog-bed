@@ -52,7 +52,6 @@
             if (resp.ok) {
                 btn.classList.add('added');
                 btn.textContent = '✓ Added';
-                if (typeof refreshCartBadge === 'function') refreshCartBadge();
                 if (typeof fbq === 'function') {
                     fbq('track', 'AddToCart', {
                         content_name: productName,
@@ -62,7 +61,11 @@
                         currency: 'USD'
                     });
                 }
-                if (window.phQuickAddReload) setTimeout(() => location.reload(), 350);
+                if (window.phQuickAddReload) {
+                    setTimeout(() => location.reload(), 350);
+                } else if (typeof cartUpdated === 'function') {
+                    cartUpdated();
+                }
             }
         }
     </script>

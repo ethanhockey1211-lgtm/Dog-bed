@@ -1,0 +1,68 @@
+@model DogBed.Models.Cart
+@if (!Model.Items.Any())
+{
+    <div class="drawer-empty text-center py-5 px-3">
+        <div style="font-size:3rem;">🐾</div>
+        <h6 class="fw-bold mt-2">Your cart is empty</h6>
+        <p class="text-muted small mb-4">Up to 70% off everything — free shipping included.</p>
+        <a href="/Shop" class="btn btn-buy-now w-100" data-bs-dismiss="offcanvas">Shop the Sale <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+}
+else
+{
+    <div class="drawer-items">
+        @foreach (var item in Model.Items)
+        {
+            <div class="drawer-item">
+                <div class="drawer-item-img">
+                    <img src="@item.Image" alt="@item.ProductName" onerror="this.src='/images/placeholder.svg'" />
+                </div>
+                <div class="flex-grow-1" style="min-width:0">
+                    <div class="drawer-item-name">@item.ProductName</div>
+                    <div class="drawer-item-meta">@item.Size · @item.Color</div>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <div class="qty-control-sm">
+                            <button type="button" aria-label="Decrease quantity"
+                                    onclick="drawerUpdateQty(@item.ProductId, '@item.Size', '@item.Color', @(item.Quantity - 1))"><i class="bi bi-dash"></i></button>
+                            <span>@item.Quantity</span>
+                            <button type="button" aria-label="Increase quantity"
+                                    onclick="drawerUpdateQty(@item.ProductId, '@item.Size', '@item.Color', @(item.Quantity + 1))"><i class="bi bi-plus"></i></button>
+                        </div>
+                        <button type="button" class="btn-remove" aria-label="Remove item"
+                                onclick="drawerUpdateQty(@item.ProductId, '@item.Size', '@item.Color', 0)"><i class="bi bi-trash3"></i></button>
+                    </div>
+                </div>
+                <div class="text-end flex-shrink-0">
+                    <div class="fw-bold">$@item.LineTotal.ToString("F2")</div>
+                    @if (item.LineSavings > 0)
+                    {
+                        <div class="drawer-save">−$@item.LineSavings.ToString("F2")</div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="drawer-summary">
+        @if (Model.TotalSavings > 0)
+        {
+            <div class="d-flex justify-content-between small" style="color:#15803d;font-weight:700;">
+                <span><i class="bi bi-tag-fill me-1"></i>You're saving</span>
+                <span>$@Model.TotalSavings.ToString("F2")</span>
+            </div>
+        }
+        <div class="d-flex justify-content-between small text-muted mt-1">
+            <span>Shipping</span><span class="text-success fw-semibold">FREE</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold fs-5 mt-1">
+            <span>Total</span><span>$@Model.Total.ToString("F2")</span>
+        </div>
+        <a href="/Checkout" class="btn btn-buy-now w-100 mt-3">
+            <i class="bi bi-lock-fill me-2"></i>Checkout Now
+        </a>
+        <a href="/Cart" class="btn-view-cart w-100 mt-2">View Full Cart</a>
+        <div class="cta-assurance mt-3">
+            <span><i class="bi bi-shield-check"></i>30-day guarantee</span>
+            <span><i class="bi bi-truck"></i>Free shipping</span>
+        </div>
+    </div>
+}

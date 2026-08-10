@@ -14,6 +14,8 @@
     }
     var promoCode = Config["Promo:Code"] ?? "WELCOME10";
     var promoPct  = Config["Promo:Percent"] ?? "10";
+    var currentPage = (ViewContext.RouteData.Values["page"] as string ?? "").ToLowerInvariant();
+    string NavActive(string page) => currentPage == page.ToLowerInvariant() ? "active" : "";
     var metaDescription = ViewData["Description"] as string
         ?? "Premium dog beds, grooming and paw care loved by 128+ verified dog parents. Free shipping on every order, 30-day money-back guarantee.";
     var siteOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
@@ -72,27 +74,44 @@
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" asp-page="/Index">
-                <span class="brand-icon"><i class="bi bi-heart-fill"></i></span>
-                PET HEAVEN
+                <svg class="logo-mark" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PET HEAVEN logo">
+                    <defs>
+                        <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#2d6a4f"/>
+                            <stop offset="1" stop-color="#1a3828"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="46" height="46" rx="13" fill="url(#logoBg)"/>
+                    <ellipse cx="24" cy="9.6" rx="7.6" ry="2.7" fill="none" stroke="#ffc93c" stroke-width="2.4" stroke-linecap="round"/>
+                    <path d="M24 39c-4.9 0-8.4-2.7-8.4-6.4 0-3.1 3.6-7.8 8.4-7.8s8.4 4.7 8.4 7.8C32.4 36.3 28.9 39 24 39z" fill="#fff"/>
+                    <ellipse cx="13.9" cy="24.2" rx="3.2" ry="4.3" fill="#fff" transform="rotate(-20 13.9 24.2)"/>
+                    <ellipse cx="20.4" cy="19.8" rx="3.2" ry="4.5" fill="#fff" transform="rotate(-7 20.4 19.8)"/>
+                    <ellipse cx="27.6" cy="19.8" rx="3.2" ry="4.5" fill="#fff" transform="rotate(7 27.6 19.8)"/>
+                    <ellipse cx="34.1" cy="24.2" rx="3.2" ry="4.3" fill="#fff" transform="rotate(20 34.1 24.2)"/>
+                </svg>
+                <span class="brand-word">PET HEAVEN<small>premium dog gear</small></span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+
+            <!-- Cart stays visible on every screen size, outside the collapsing menu -->
+            <div class="d-flex align-items-center gap-2 order-lg-last">
+                <button type="button" class="cart-launch" onclick="openCartDrawer()" aria-label="Open cart">
+                    <i class="bi bi-bag-fill"></i>
+                    <span class="d-none d-sm-inline">Cart</span>
+                    <span class="cart-count-chip" id="cartCount">0</span>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" asp-page="/Shop">Shop All</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/DogBed">Dog Beds</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/Brush">Grooming</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/PawButter">Paw Care</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/BathBrush">Bath Time</a></li>
+                <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link @NavActive("/Shop")" asp-page="/Shop"><i class="bi bi-grid-fill me-1"></i>Shop All</a></li>
+                    <li class="nav-item"><a class="nav-link @NavActive("/DogBed")" asp-page="/DogBed"><i class="bi bi-moon-stars-fill me-1"></i>Dog Beds</a></li>
+                    <li class="nav-item"><a class="nav-link @NavActive("/Brush")" asp-page="/Brush"><i class="bi bi-stars me-1"></i>Grooming</a></li>
+                    <li class="nav-item"><a class="nav-link @NavActive("/PawButter")" asp-page="/PawButter"><i class="bi bi-heart-pulse-fill me-1"></i>Paw Care</a></li>
+                    <li class="nav-item"><a class="nav-link @NavActive("/BathBrush")" asp-page="/BathBrush"><i class="bi bi-droplet-fill me-1"></i>Bath Time</a></li>
                 </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <a asp-page="/Orders" class="nav-link" style="font-size:.8rem; opacity:.6">Orders</a>
-                    <a asp-page="/Cart" class="cart-btn position-relative">
-                        <i class="bi bi-bag fs-5"></i>
-                        <span class="cart-badge" id="cartCount">0</span>
-                    </a>
-                </div>
             </div>
         </div>
     </nav>
@@ -106,7 +125,15 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="footer-brand mb-3">
-                        <span class="brand-icon"><i class="bi bi-heart-fill"></i></span>
+                        <svg class="logo-mark logo-mark-sm" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="1" y="1" width="46" height="46" rx="13" fill="rgba(255,255,255,.12)"/>
+                            <ellipse cx="24" cy="9.6" rx="7.6" ry="2.7" fill="none" stroke="#ffc93c" stroke-width="2.4" stroke-linecap="round"/>
+                            <path d="M24 39c-4.9 0-8.4-2.7-8.4-6.4 0-3.1 3.6-7.8 8.4-7.8s8.4 4.7 8.4 7.8C32.4 36.3 28.9 39 24 39z" fill="#fff"/>
+                            <ellipse cx="13.9" cy="24.2" rx="3.2" ry="4.3" fill="#fff" transform="rotate(-20 13.9 24.2)"/>
+                            <ellipse cx="20.4" cy="19.8" rx="3.2" ry="4.5" fill="#fff" transform="rotate(-7 20.4 19.8)"/>
+                            <ellipse cx="27.6" cy="19.8" rx="3.2" ry="4.5" fill="#fff" transform="rotate(7 27.6 19.8)"/>
+                            <ellipse cx="34.1" cy="24.2" rx="3.2" ry="4.3" fill="#fff" transform="rotate(20 34.1 24.2)"/>
+                        </svg>
                         PET HEAVEN
                     </div>
                     <p class="small" style="color:rgba(255,255,255,.65)">
@@ -151,6 +178,8 @@
             <hr class="mt-4" />
             <p class="text-center text-muted small mb-0">
                 &copy; @DateTime.Now.Year PET HEAVEN. All rights reserved.
+                &nbsp;·&nbsp;
+                <a asp-page="/Orders" style="color:rgba(255,255,255,.35);text-decoration:none;">Store admin</a>
             </p>
         </div>
     </footer>
@@ -171,6 +200,20 @@
 
     <div id="copiedToast">Copied to clipboard ✓</div>
 
+    <!-- Slide-out cart drawer -->
+    <div class="offcanvas offcanvas-end cart-drawer" tabindex="-1" id="cartDrawer" aria-label="Shopping cart">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold"><i class="bi bi-bag-fill me-2" style="color:var(--accent);"></i>Your Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" id="cartDrawerBody">
+            <div class="text-center text-muted py-5"><div class="spinner-border spinner-border-sm"></div></div>
+        </div>
+    </div>
+
+    <!-- Site-wide antiforgery token for fetch-based cart calls -->
+    <form id="afTokenForm" style="display:none">@Html.AntiForgeryToken()</form>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
@@ -181,11 +224,51 @@
                     const badge = document.getElementById('cartCount');
                     if (badge) {
                         badge.textContent = data.count;
-                        badge.style.display = data.count > 0 ? 'flex' : 'none';
+                        badge.style.display = data.count > 0 ? 'inline-flex' : 'none';
                     }
                 }).catch(() => {});
         }
         refreshCartBadge();
+
+        async function refreshCartDrawer() {
+            const body = document.getElementById('cartDrawerBody');
+            if (!body) return;
+            try {
+                const resp = await fetch('/Cart?handler=Drawer');
+                if (resp.ok) body.innerHTML = await resp.text();
+            } catch (e) { /* keep whatever is shown */ }
+        }
+
+        function openCartDrawer() {
+            const el = document.getElementById('cartDrawer');
+            if (!el || typeof bootstrap === 'undefined') { window.location.href = '/Cart'; return; }
+            bootstrap.Offcanvas.getOrCreateInstance(el).show();
+            refreshCartDrawer();
+        }
+
+        // Called by every add-to-cart on the site: updates the badge and
+        // slides the cart open so the shopper sees exactly what happened.
+        function cartUpdated(openDrawer = true) {
+            refreshCartBadge();
+            if (openDrawer) openCartDrawer();
+        }
+
+        async function drawerUpdateQty(productId, size, color, qty) {
+            const token = document.querySelector('#afTokenForm input[name="__RequestVerificationToken"]')?.value;
+            const fd = new FormData();
+            fd.append('productId', productId);
+            fd.append('size', size);
+            fd.append('color', color);
+            fd.append('quantity', qty);
+            if (token) fd.append('__RequestVerificationToken', token);
+            await fetch('/Cart?handler=UpdateCart', {
+                method: 'POST', body: fd,
+                headers: token ? { 'RequestVerificationToken': token } : {}
+            }).catch(() => {});
+            refreshCartBadge();
+            refreshCartDrawer();
+            if (window.location.pathname.toLowerCase().startsWith('/cart')) location.reload();
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

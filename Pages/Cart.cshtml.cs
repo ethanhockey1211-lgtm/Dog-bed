@@ -21,6 +21,13 @@ public class CartModel : PageModel
         CrossSells = _products.GetAll().Where(p => !inCart.Contains(p.Id)).ToList();
     }
 
+    // Renders the slide-out mini cart; fetched by the drawer JS in the layout
+    public PartialViewResult OnGetDrawer()
+    {
+        Cart = CartService.GetCart(HttpContext.Session);
+        return Partial("_CartDrawer", Cart);
+    }
+
     public IActionResult OnPostUpdateCart(int productId, string size, string color, int quantity)
     {
         CartService.UpdateQuantity(HttpContext.Session, productId, size, color, quantity);

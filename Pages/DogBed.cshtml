@@ -488,8 +488,7 @@
             headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
         });
         if (response.ok) {
-            new bootstrap.Toast(document.getElementById('cartToast')).show();
-            refreshCartBadge();
+            cartUpdated();
             const size = document.getElementById('formSize').value;
             const v = variantData.find(x => x.size === size);
             fbq('track', 'AddToCart', {

@@ -338,8 +338,7 @@
         const response = await fetch(form.action, { method: 'POST', body: formData,
             headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') } });
         if (response.ok) {
-            new bootstrap.Toast(document.getElementById('cartToast')).show();
-            refreshCartBadge();
+            cartUpdated();
             fbq('track', 'AddToCart', {
                 content_name: '@product.Name', content_ids: ['@product.Id'],
                 content_type: 'product', value: @variants.First().Price.ToString("F2"), currency: 'USD'
