@@ -23,7 +23,8 @@
                                 </div>
                             </div>
                             <button type="button" class="btn-quick-add" data-price="@p.MinPrice.ToString("F2")"
-                                    onclick="phQuickAdd(this, @p.Id, '@Html.Raw(p.Name.Replace("'", "\\'"))')">
+                                    data-name="@p.Name" data-product-id="@p.Id"
+                                    onclick="phQuickAdd(this)">
                                 + Add
                             </button>
                         </div>
@@ -33,8 +34,10 @@
         </div>
     </section>
     <script>
-        async function phQuickAdd(btn, productId, productName) {
+        async function phQuickAdd(btn) {
             if (btn.classList.contains('added')) return;
+            const productId = btn.dataset.productId;
+            const productName = btn.dataset.name;
             const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
             const fd = new FormData();
             fd.append('productId', productId);

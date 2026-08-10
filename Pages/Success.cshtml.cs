@@ -31,12 +31,12 @@ public class SuccessModel : PageModel
 
         OrderRef = session_id.Length >= 8 ? session_id[^8..].ToUpper() : session_id;
 
-        // Already saved — emails were sent on first visit
+        // Already saved (by the webhook or an earlier visit) — emails were sent by whoever created it
         Order = _store.GetBySessionId(session_id);
         if (Order != null)
         {
             CustomerEmail = Order.CustomerEmail;
-            CartService.ClearCart(HttpContext.Session);
+            ClearCartOnce(session_id);
             return;
         }
 
@@ -65,11 +65,21 @@ public class SuccessModel : PageModel
         _store.Save(order);
         await _queue.EnqueueAsync(order);
         Order = order;
-        CartService.ClearCart(HttpContext.Session);
+        ClearCartOnce(session_id);
 
         // Send emails — errors are logged inside EmailService but don't break the page
         await _email.SendOrderNotificationAsync(order);
         await _email.SendBuyerConfirmationAsync(order);
+    }
+
+    // Clear the cart once per Stripe session so revisiting an old receipt URL
+    // can't wipe a cart the customer has built since.
+    private void ClearCartOnce(string sessionId)
+    {
+        var key = "CartCleared_" + sessionId;
+        if (HttpContext.Session.GetString(key) == "1") return;
+        CartService.ClearCart(HttpContext.Session);
+        HttpContext.Session.SetString(key, "1");
     }
 
     private static FulfillmentOrder BuildOrder(Stripe.Checkout.Session session)

@@ -41,8 +41,9 @@
                             <input asp-for="Order.Email" type="email" class="form-control" placeholder="jane@example.com" required />
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Phone</label>
-                            <input asp-for="Order.Phone" type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
+                            <label class="form-label">Phone *</label>
+                            <input asp-for="Order.Phone" type="tel" class="form-control" placeholder="+1 (555) 000-0000" required />
+                            <div class="small text-muted mt-1">Needed by the shipping carrier for delivery updates.</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Street Address *</label>

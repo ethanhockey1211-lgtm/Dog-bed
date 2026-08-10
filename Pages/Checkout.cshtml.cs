@@ -51,8 +51,10 @@ public class CheckoutModel : PageModel
         if (string.IsNullOrWhiteSpace(Order.FirstName) ||
             string.IsNullOrWhiteSpace(Order.LastName)  ||
             string.IsNullOrWhiteSpace(Order.Email)     ||
+            string.IsNullOrWhiteSpace(Order.Phone)     ||
             string.IsNullOrWhiteSpace(Order.Address)   ||
             string.IsNullOrWhiteSpace(Order.City)      ||
+            string.IsNullOrWhiteSpace(Order.State)     ||
             string.IsNullOrWhiteSpace(Order.ZipCode))
         {
             ModelState.AddModelError("", "Please fill in all required fields.");

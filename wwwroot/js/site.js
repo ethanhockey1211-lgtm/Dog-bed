@@ -59,6 +59,7 @@ document.querySelectorAll('.feature-card, .review-card, .size-table-wrapper, .xs
 
 // ── Copy to clipboard helper (used by admin + promo popup) ────
 function copyText(text, el) {
+    if (!text || !text.trim()) return;
     const done = () => {
         const toast = document.getElementById('copiedToast');
         if (toast) {
@@ -85,7 +86,7 @@ function fallbackCopy(text, done) {
     ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.select();
-    try { document.execCommand('copy'); done(); } catch (e) { /* ignore */ }
+    try { if (document.execCommand('copy')) done(); } catch (e) { /* ignore */ }
     document.body.removeChild(ta);
 }
 

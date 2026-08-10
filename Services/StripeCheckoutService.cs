@@ -122,7 +122,9 @@ public class StripeCheckoutService
                 size         = it.Size,
                 color        = it.Color,
                 dimensionsCm = it.DimensionsCm,
-                unitPrice    = it.UnitPrice,
+                // Store what the buyer actually pays per unit so rebuilt orders,
+                // the cockpit, and emails reconcile with the charged amount
+                unitPrice    = Discounted(it.UnitPrice),
                 quantity     = it.Quantity
             });
         }

@@ -46,6 +46,7 @@ app.MapPost("/api/stripe-webhook", async (
     HttpRequest req,
     OrderQueue queue,
     OrderStore store,
+    EmailService email,
     IConfiguration config,
     ILogger<Program> logger) =>
 {
@@ -68,12 +69,19 @@ app.MapPost("/api/stripe-webhook", async (
     if (evt.Type == EventTypes.CheckoutSessionCompleted)
     {
         var session = evt.Data.Object as Session;
-        if (session?.PaymentStatus == "paid")
+        // Redelivered webhooks must not recreate the order — that would reset its
+        // fulfillment status and wipe the AliExpress order # / tracking number.
+        if (session?.PaymentStatus == "paid" && store.GetBySessionId(session.Id) is null)
         {
             var order = BuildOrder(session);
             store.Save(order);
             await queue.EnqueueAsync(order);
             logger.LogInformation("New paid order {Id} queued", order.Id);
+
+            // Whichever path creates the order sends the emails exactly once;
+            // the Success page only emails for orders it created itself.
+            await email.SendOrderNotificationAsync(order);
+            await email.SendBuyerConfirmationAsync(order);
         }
     }
 

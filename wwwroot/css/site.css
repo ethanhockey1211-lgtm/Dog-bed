@@ -1198,6 +1198,10 @@ hr { border-color: var(--border); opacity: 1; }
 .sticky-atc .btn-buy-now { padding: .7rem 1.2rem; font-size: .88rem; flex: 1; }
 @media (max-width: 991px) {
     .sticky-atc { display: flex; }
+    /* Lift the add-to-cart toast clear of the sticky bar while it's shown */
+    .sticky-atc.show ~ .toast-container {
+        bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    }
 }
 
 /* ─── Cross-sell (“Complete the set”) ────────────────────── */
@@ -1311,6 +1315,8 @@ hr { border-color: var(--border); opacity: 1; }
     align-items: center;
     justify-content: center;
     padding: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 .promo-overlay.show { display: flex; animation: promo-fade .25s ease; }
 @keyframes promo-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -1324,6 +1330,7 @@ hr { border-color: var(--border); opacity: 1; }
     position: relative;
     box-shadow: var(--shadow-lg);
     animation: promo-pop .3s cubic-bezier(.34,1.56,.64,1);
+    margin: auto; /* keeps the whole card reachable when it overflows a short viewport */
 }
 @keyframes promo-pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .promo-close {

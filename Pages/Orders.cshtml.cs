@@ -56,7 +56,7 @@ public class OrdersModel : PageModel
         if (HttpContext.Session.GetString(AuthKey) != "yes") return RedirectToPage();
 
         var order = _store.GetBySessionId(sessionId);
-        if (order != null)
+        if (order != null && order.Status is FulfillmentStatus.Pending or FulfillmentStatus.Failed)
         {
             order.Status = FulfillmentStatus.Processing;
             if (!string.IsNullOrWhiteSpace(aliOrderId))
@@ -71,7 +71,8 @@ public class OrdersModel : PageModel
         if (HttpContext.Session.GetString(AuthKey) != "yes") return RedirectToPage();
 
         var order = _store.GetBySessionId(sessionId);
-        if (order != null)
+        // Status guard: a double-submit or stale tab must not email the customer twice
+        if (order != null && order.Status != FulfillmentStatus.Fulfilled)
         {
             order.Status = FulfillmentStatus.Fulfilled;
             order.FulfilledAt = DateTime.UtcNow;
