@@ -68,20 +68,27 @@ public class StripeCheckoutService
         StripeConfiguration.ApiKey = config["Stripe:SecretKey"];
     }
 
-    public async Task<string> CreateSessionAsync(Cart cart, Order shipping, string baseUrl)
+    public async Task<string> CreateSessionAsync(Cart cart, Order shipping, string baseUrl,
+        decimal discountPct = 0m, string? promoCode = null)
     {
+        // Promo discount is applied per unit price so Stripe's page shows honest line totals
+        decimal Discounted(decimal price) =>
+            discountPct > 0 ? Math.Round(price * (1 - discountPct), 2) : price;
+
         var lineItems = cart.Items.Select(item => new SessionLineItemOptions
         {
             PriceData = new SessionLineItemPriceDataOptions
             {
                 Currency = "usd",
-                UnitAmountDecimal = item.UnitPrice * 100,
+                UnitAmountDecimal = Discounted(item.UnitPrice) * 100,
                 ProductData = new SessionLineItemPriceDataProductDataOptions
                 {
                     Name = item.Size == "One Size"
                         ? item.ProductName
                         : $"{item.ProductName} — Size {item.Size}",
-                    Description = $"{item.DimensionsCm} · {item.Color}"
+                    Description = discountPct > 0
+                        ? $"{item.DimensionsCm} · {item.Color} · {promoCode} −{discountPct * 100:0}% applied"
+                        : $"{item.DimensionsCm} · {item.Color}"
                 }
             },
             Quantity = item.Quantity
@@ -102,6 +109,9 @@ public class StripeCheckoutService
             ["ItemCount"]  = cart.Items.Count.ToString()
         };
 
+        if (discountPct > 0 && !string.IsNullOrEmpty(promoCode))
+            meta["PromoCode"] = promoCode;
+
         for (int i = 0; i < cart.Items.Count; i++)
         {
             var it = cart.Items[i];
@@ -117,11 +127,12 @@ public class StripeCheckoutService
             });
         }
 
-        // Apply state sales tax based on shipping address
+        // Apply state sales tax based on shipping address (on the discounted subtotal)
+        var taxableSubtotal = cart.Items.Sum(i => Discounted(i.UnitPrice) * i.Quantity);
         var stateKey = shipping.State?.Trim().ToUpper() ?? "";
         if (StateTaxRates.TryGetValue(stateKey, out var taxRate) && taxRate > 0)
         {
-            var taxAmount = Math.Round(cart.Total * taxRate, 2);
+            var taxAmount = Math.Round(taxableSubtotal * taxRate, 2);
             var taxPct    = (taxRate * 100).ToString("G29");
             lineItems.Add(new SessionLineItemOptions
             {
@@ -146,7 +157,7 @@ public class StripeCheckoutService
             CustomerEmail      = shipping.Email,
             Metadata           = meta,
             SuccessUrl         = $"{baseUrl}/success?session_id={{CHECKOUT_SESSION_ID}}",
-            CancelUrl          = $"{baseUrl}/checkout"
+            CancelUrl          = $"{baseUrl}/cancel"
         };
 
         var service = new SessionService();

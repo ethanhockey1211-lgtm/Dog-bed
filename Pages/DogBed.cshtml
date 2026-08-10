@@ -4,8 +4,36 @@
     ViewData["Title"] = "PET HEAVEN Super Sized Dog Bed";
     var product = Model.Product!;
     var variants = product.Variants;
+    ViewData["Description"] = product.ShortDescription + " Free shipping, 30-day money-back guarantee.";
+    ViewData["OgImage"] = product.Images.FirstOrDefault();
     var deliveryStart = DateTime.Now.AddDays(5).ToString("MMMM d");
     var deliveryEnd = DateTime.Now.AddDays(12).ToString("MMMM d");
+    var firstVariant = variants.First();
+}
+
+@section Head {
+    <script type="application/ld+json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object?>
+    {
+        ["@context"] = "https://schema.org",
+        ["@type"] = "Product",
+        ["name"] = product.Name,
+        ["description"] = product.ShortDescription,
+        ["image"] = product.Images,
+        ["aggregateRating"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "AggregateRating",
+            ["ratingValue"] = product.Rating,
+            ["reviewCount"] = product.ReviewCount
+        },
+        ["offers"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "AggregateOffer",
+            ["priceCurrency"] = "USD",
+            ["lowPrice"] = variants.Min(v => v.Price).ToString("F2"),
+            ["highPrice"] = variants.Max(v => v.Price).ToString("F2"),
+            ["availability"] = "https://schema.org/InStock"
+        }
+    }))</script>
 }
 
 <!-- Hero / Product Section -->
@@ -57,17 +85,15 @@
                     <p class="product-short-desc">@product.ShortDescription</p>
 
                     <div class="price-block" id="priceBlock">
-                        <span class="sale-price" id="salePrice">$@variants.First().Price.ToString("F2")</span>
-                        <span id="origPrice" style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@variants.First().OriginalPrice.ToString("F2")</span>
-                        <span id="saveBadge" style="background:#e8f5e9;color:#2e7d32;font-size:.8rem;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px;">SAVE 70%</span>
+                        <span class="sale-price" id="salePrice">$@firstVariant.Price.ToString("F2")</span>
+                        <span id="origPrice" style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@firstVariant.OriginalPrice.ToString("F2")</span>
+                        <span id="saveBadge" class="save-chip" style="margin-left:8px;">SAVE $@((firstVariant.OriginalPrice - firstVariant.Price).ToString("F2"))</span>
                     </div>
 
                     <div class="mt-2 mb-1" style="font-size:.85rem;color:#555;">
                         <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
                     </div>
-                    <div class="mb-3" style="font-size:.82rem;color:#c0392b;font-weight:600;">
-                        <i class="bi bi-fire me-1"></i> Low stock — selling fast
-                    </div>
+                    <div class="stock-line mb-3" id="stockLine"></div>
 
                     <hr />
 
@@ -103,13 +129,25 @@
                     </div>
 
                     <!-- CTA Buttons -->
-                    <div class="cta-buttons mb-3">
+                    <div class="cta-buttons mb-2">
                         <button class="btn btn-add-cart w-100 mb-2" onclick="addToCart()">
                             <i class="bi bi-bag-plus me-2"></i>Add to Cart
                         </button>
                         <a asp-page="/Checkout" class="btn btn-buy-now w-100" id="buyNowBtn" onclick="return buyNow(event)">
                             <i class="bi bi-lightning-fill me-2"></i>Buy It Now
                         </a>
+                    </div>
+                    <div class="cta-assurance mb-3">
+                        <span><i class="bi bi-shield-check"></i>30-day guarantee</span>
+                        <span><i class="bi bi-truck"></i>Free shipping</span>
+                        <span><i class="bi bi-arrow-counterclockwise"></i>Easy returns</span>
+                    </div>
+                    <div class="pay-row mb-3 justify-content-center">
+                        <span class="pay-chip"><i class="bi bi-credit-card-2-front-fill"></i>Visa</span>
+                        <span class="pay-chip"><i class="bi bi-credit-card-fill"></i>Mastercard</span>
+                        <span class="pay-chip"><i class="bi bi-credit-card"></i>Amex</span>
+                        <span class="pay-chip"><i class="bi bi-apple"></i>Pay</span>
+                        <span class="pay-chip"><i class="bi bi-google"></i>Pay</span>
                     </div>
 
                     <!-- Guarantee -->
@@ -337,6 +375,23 @@
     </div>
 </section>
 
+<!-- Cross-sell -->
+<partial name="_CrossSell" model="Model.CrossSells" />
+
+<!-- Sticky mobile add-to-cart -->
+<div class="sticky-atc" id="stickyAtc">
+    <div class="sticky-atc-img">
+        <img src="@product.Images.First()" alt="@product.Name" onerror="this.src='/images/placeholder.svg'" />
+    </div>
+    <div class="sticky-atc-price">
+        <div class="now" id="stickyPrice">$@firstVariant.Price.ToString("F2")</div>
+        <div class="was" id="stickyWas">$@firstVariant.OriginalPrice.ToString("F2")</div>
+    </div>
+    <button class="btn btn-buy-now" onclick="addToCart()">
+        <i class="bi bi-bag-plus me-1"></i>Add to Cart
+    </button>
+</div>
+
 <!-- Toast notification -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="cartToast" class="toast align-items-center border-0" role="alert">
@@ -364,9 +419,22 @@
             size = v.Size,
             price = v.Price,
             originalPrice = v.OriginalPrice,
-            dimensionsCm = v.DimensionsCm
+            dimensionsCm = v.DimensionsCm,
+            stock = v.Stock
         })
     ));
+
+    function renderStock(v) {
+        const line = document.getElementById('stockLine');
+        if (!line || !v) return;
+        if (v.stock <= 30) {
+            line.className = 'stock-line low mb-3';
+            line.innerHTML = '<i class="bi bi-fire me-1"></i>Only ' + v.stock + ' left in ' + v.size + ' at this price';
+        } else {
+            line.className = 'stock-line ok mb-3';
+            line.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>In stock — ships within 24 hours';
+        }
+    }
 
     function selectSize(btn) {
         document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -378,10 +446,26 @@
         if (v) {
             document.getElementById('salePrice').textContent = '$' + v.price.toFixed(2);
             document.getElementById('origPrice').textContent = '$' + v.originalPrice.toFixed(2);
-            const pct = Math.round((1 - v.price / v.originalPrice) * 100);
-            document.getElementById('saveBadge').textContent = 'SAVE ' + pct + '%';
+            document.getElementById('saveBadge').textContent = 'SAVE $' + (v.originalPrice - v.price).toFixed(2);
+            const sp = document.getElementById('stickyPrice');
+            const sw = document.getElementById('stickyWas');
+            if (sp) sp.textContent = '$' + v.price.toFixed(2);
+            if (sw) sw.textContent = '$' + v.originalPrice.toFixed(2);
+            renderStock(v);
         }
     }
+
+    renderStock(variantData[0]);
+
+    // Show the sticky bar once the buy box scrolls out of view
+    (function () {
+        const bar = document.getElementById('stickyAtc');
+        const anchor = document.getElementById('priceBlock');
+        if (!bar || !anchor || !('IntersectionObserver' in window)) return;
+        new IntersectionObserver(entries => {
+            bar.classList.toggle('show', !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0);
+        }).observe(anchor);
+    })();
 
     function changeQty(delta) {
         const input = document.getElementById('qty');

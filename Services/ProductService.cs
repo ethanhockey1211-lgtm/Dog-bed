@@ -13,6 +13,8 @@ public class ProductService
             new Product
             {
                 Id = 1,
+                PageUrl = "/DogBed",
+                Badge = "BEST SELLER",
                 Name = "PET HEAVEN Super Sized Dog Bed",
                 ShortDescription = "Soft, dirt-resistant & non-slip — the ultimate comfort bed for dogs of all sizes.",
                 Description = "Give your dog the sleep they deserve. The PET HEAVEN bed features a deep bolster design with ultra-soft corduroy velvet lining, a waterproof non-slip base, and a removable washable cover. Perfect for living rooms, bedrooms, and outdoor spaces.",
@@ -53,6 +55,7 @@ public class ProductService
             new Product
             {
                 Id = 2,
+                PageUrl = "/Brush",
                 Name = "PET HEAVEN Self-Cleaning Grooming Brush",
                 ShortDescription = "One-click hair removal with bent needle massaging comb — for dogs & cats of all sizes.",
                 Description = "Keep your pet's coat clean and healthy with the PET HEAVEN grooming brush. The bent needle design gently massages skin while removing loose fur, and the one-click button ejects collected hair instantly. Works on all coat types.",
@@ -90,6 +93,8 @@ public class ProductService
             new Product
             {
                 Id = 3,
+                PageUrl = "/PawButter",
+                Badge = "STAFF PICK",
                 Name = "PET HEAVEN Paw Butter Balm",
                 ShortDescription = "Heal cracked, sore paws in days — all-natural coconut oil formula that moisturizes, protects & repairs.",
                 Description = "Your dog walks on every surface — hot pavement, icy sidewalks, rough trails. Over time, paw pads crack, dry out, and become painful. PET HEAVEN Paw Butter uses a rich coconut botanical oil blend to deeply moisturize, heal cracks, and form a protective barrier with every use. 100% pet-safe — licking is totally fine.",
@@ -127,6 +132,8 @@ public class ProductService
             new Product
             {
                 Id = 4,
+                PageUrl = "/BathBrush",
+                Badge = "TRENDING",
                 Name = "PET HEAVEN 2-in-1 Dog Bath Brush",
                 ShortDescription = "Built-in soap dispenser + soft silicone massage bristles — bath time made easy for you and your dog.",
                 Description = "Bath time just got a whole lot easier. The PET HEAVEN Bath Brush combines a built-in shampoo dispenser with ultra-soft silicone bristles that lather, massage, and clean all at once — no more fumbling with bottles mid-bath. Your dog gets a spa-quality massage while you get a stress-free wash. Works on all coat types, all breeds.",

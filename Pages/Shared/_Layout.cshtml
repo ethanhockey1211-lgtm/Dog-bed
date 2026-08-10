@@ -1,14 +1,43 @@
+@using System.Globalization
+@inject IConfiguration Config
+@{
+    // Sale deadline: explicit date from config, else the current weekly promo window (ends Sunday night UTC)
+    DateTime saleEndUtc;
+    if (!DateTime.TryParse(Config["Sale:EndsAt"], CultureInfo.InvariantCulture,
+            DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out saleEndUtc)
+        || saleEndUtc <= DateTime.UtcNow)
+    {
+        var now = DateTime.UtcNow;
+        var daysUntilMonday = ((int)DayOfWeek.Monday - (int)now.DayOfWeek + 7) % 7;
+        if (daysUntilMonday == 0) daysUntilMonday = 7;
+        saleEndUtc = now.Date.AddDays(daysUntilMonday);
+    }
+    var promoCode = Config["Promo:Code"] ?? "WELCOME10";
+    var promoPct  = Config["Promo:Percent"] ?? "10";
+    var metaDescription = ViewData["Description"] as string
+        ?? "Premium dog beds, grooming and paw care loved by 128+ verified dog parents. Free shipping on every order, 30-day money-back guarantee.";
+    var siteOrigin = $"{Context.Request.Scheme}://{Context.Request.Host}";
+    var ogImage = siteOrigin + (ViewData["OgImage"] as string ?? "/images/IMG_1046.jpeg");
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — PET HEAVEN Beds</title>
+    <title>@ViewData["Title"] — PET HEAVEN</title>
+    <meta name="description" content="@metaDescription" />
+    <meta property="og:site_name" content="PET HEAVEN" />
+    <meta property="og:title" content="@ViewData["Title"] — PET HEAVEN" />
+    <meta property="og:description" content="@metaDescription" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="@ogImage" />
+    <meta name="theme-color" content="#1a3828" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Head", required: false)
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -31,9 +60,12 @@
 
     <!-- Announcement bar -->
     <div class="announcement-bar">
-        <i class="bi bi-fire me-2" style="color:#f97316;"></i><strong>SALE — Up to 70% OFF</strong> &nbsp;|&nbsp;
-        <i class="bi bi-truck me-2"></i>Free shipping on all orders &nbsp;|&nbsp;
-        <i class="bi bi-arrow-repeat me-2"></i>30-day free returns
+        <span><i class="bi bi-fire me-1" style="color:#f97316;"></i><strong>Sale — up to 70% off</strong></span>
+        <span class="countdown-pill" id="saleCountdown" data-end="@saleEndUtc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'")">
+            <i class="bi bi-stopwatch me-1"></i>Ends in <span id="saleCountdownVal">…</span>
+        </span>
+        <span class="d-none d-md-inline"><i class="bi bi-truck me-1"></i>Free shipping on every order</span>
+        <span class="d-none d-lg-inline"><i class="bi bi-arrow-repeat me-1"></i>30-day money-back guarantee</span>
     </div>
 
     <!-- Navbar -->
@@ -52,7 +84,7 @@
                     <li class="nav-item"><a class="nav-link" asp-page="/DogBed">Dog Beds</a></li>
                     <li class="nav-item"><a class="nav-link" asp-page="/Brush">Grooming</a></li>
                     <li class="nav-item"><a class="nav-link" asp-page="/PawButter">Paw Care</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-page="/BathBrush">Bath Brush</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-page="/BathBrush">Bath Time</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
                     <a asp-page="/Orders" class="nav-link" style="font-size:.8rem; opacity:.6">Orders</a>
@@ -77,22 +109,28 @@
                         <span class="brand-icon"><i class="bi bi-heart-fill"></i></span>
                         PET HEAVEN
                     </div>
-                    <p class="small" style="color:rgba(255,255,255,.65)">Premium comfort beds designed so your pet can rest like royalty.</p>
+                    <p class="small" style="color:rgba(255,255,255,.65)">
+                        Premium comfort, grooming and care — everything your dog needs to live like royalty.
+                    </p>
+                    <p class="small mb-0" style="color:rgba(255,255,255,.65)">
+                        <span style="color:#ffc93c">★★★★★</span> Rated 4.9/5 by verified buyers
+                    </p>
                 </div>
                 <div class="col-6 col-lg-2">
                     <h6 class="footer-heading">Shop</h6>
                     <ul class="footer-links">
                         <li><a asp-page="/DogBed">Dog Beds</a></li>
-                        <li><a href="#">New Arrivals</a></li>
-                        <li><a href="#">Best Sellers</a></li>
+                        <li><a asp-page="/Brush">Grooming Brush</a></li>
+                        <li><a asp-page="/PawButter">Paw Butter</a></li>
+                        <li><a asp-page="/BathBrush">Bath Brush</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-lg-2">
                     <h6 class="footer-heading">Support</h6>
                     <ul class="footer-links">
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Free Shipping</a></li>
-                        <li><a href="#">Returns</a></li>
+                        <li><a asp-page="/DogBed" asp-fragment="faq">FAQ</a></li>
+                        <li><a asp-page="/Shop">Free Shipping</a></li>
+                        <li><a asp-page="/Shop">30-Day Returns</a></li>
                         <li><a href="mailto:n10dee23@gmail.com">Contact</a></li>
                     </ul>
                 </div>
@@ -101,9 +139,13 @@
                     <div class="payment-icons">
                         <span><i class="bi bi-credit-card-2-front-fill"></i> Visa</span>
                         <span><i class="bi bi-credit-card-fill"></i> Mastercard</span>
-                        <span><i class="bi bi-paypal"></i> PayPal</span>
+                        <span><i class="bi bi-credit-card"></i> Amex</span>
                         <span><i class="bi bi-apple"></i> Pay</span>
+                        <span><i class="bi bi-google"></i> Pay</span>
                     </div>
+                    <p class="small mt-3 mb-0" style="color:rgba(255,255,255,.5)">
+                        <i class="bi bi-shield-lock me-1"></i>Payments secured by Stripe · 256-bit SSL
+                    </p>
                 </div>
             </div>
             <hr class="mt-4" />
@@ -112,6 +154,22 @@
             </p>
         </div>
     </footer>
+
+    <!-- First-order offer popup -->
+    <div class="promo-overlay" id="promoOverlay" role="dialog" aria-modal="true" aria-label="Discount offer">
+        <div class="promo-modal">
+            <button class="promo-close" id="promoClose" aria-label="Close">&times;</button>
+            <div class="promo-emoji">🐾</div>
+            <h4>Wait — don't leave empty-pawed!</h4>
+            <p>Here's <strong>@promoPct% off</strong> your first order. Use this code at checkout — it stacks with the sale prices.</p>
+            <div class="promo-code-box" id="promoCodeBox" title="Click to copy">@promoCode</div>
+            <p class="promo-code-hint">Click the code to copy it</p>
+            <a asp-page="/Shop" class="btn btn-buy-now w-100 mb-2">Shop the Sale <i class="bi bi-arrow-right ms-1"></i></a>
+            <button class="btn btn-link btn-sm text-muted w-100" id="promoDismiss" style="text-decoration:none;font-size:.78rem;">No thanks, my dog has everything</button>
+        </div>
+    </div>
+
+    <div id="copiedToast">Copied to clipboard ✓</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

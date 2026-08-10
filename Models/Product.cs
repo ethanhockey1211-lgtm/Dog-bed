@@ -6,12 +6,20 @@ public class Product
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
     public string ShortDescription { get; set; } = "";
+    public string PageUrl { get; set; } = "";
+    public string? Badge { get; set; }
+    public string? SupplierUrl { get; set; }
     public List<ProductVariant> Variants { get; set; } = new();
     public List<string> Features { get; set; } = new();
     public List<string> Images { get; set; } = new();
     public double Rating { get; set; }
     public int ReviewCount { get; set; }
     public List<Review> Reviews { get; set; } = new();
+
+    public decimal MinPrice => Variants.Min(v => v.Price);
+    public decimal MinOriginalPrice => Variants.Min(v => v.OriginalPrice);
+    public int DiscountPct => (int)Math.Round((1 - MinPrice / MinOriginalPrice) * 100);
+    public decimal MinSavings => MinOriginalPrice - MinPrice;
 }
 
 public class ProductVariant

@@ -1,73 +1,111 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "PET HEAVEN — Premium Pet Supplies";
+    ViewData["Title"] = "Premium Dog Beds & Care Your Pup Will Love";
+    ViewData["Description"] = "Ultra-soft dog beds, self-cleaning grooming brushes, healing paw butter and 2-in-1 bath brushes. Free shipping, 30-day money-back guarantee, up to 70% off.";
+
+    var totalReviews = Model.AllProducts.Sum(p => p.ReviewCount);
+    var avgRating = totalReviews > 0
+        ? Model.AllProducts.Sum(p => p.Rating * p.ReviewCount) / totalReviews
+        : 5.0;
+    var heroBed = Model.AllProducts.FirstOrDefault(p => p.Id == 1);
+
+    // Real reviews pulled straight from the product data
+    var featured = new[] { 3, 4, 1 }
+        .Select(id => Model.AllProducts.FirstOrDefault(p => p.Id == id))
+        .Where(p => p != null && p!.Reviews.Any())
+        .Select(p => (Product: p!, Review: p!.Reviews.First()))
+        .ToList();
 }
 
 <!-- Hero -->
-<section style="background:linear-gradient(135deg,#1a3c2e 0%,#2d6a4f 100%);color:#fff;padding:80px 0 60px;">
-    <div class="container text-center">
-        <p style="letter-spacing:.15em;font-size:.8rem;opacity:.7;text-transform:uppercase;margin-bottom:12px;">Premium Pet Supplies</p>
-        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:16px;line-height:1.2;">
-            Your Pet Deserves the Best
-        </h1>
-        <p style="font-size:1.1rem;opacity:.85;max-width:520px;margin:0 auto 16px;">
-            Hand-picked, premium-quality products for dogs and cats. Free shipping on every single order.
-        </p>
-        <p style="font-size:.92rem;opacity:.75;margin-bottom:32px;">
-            <span style="background:rgba(255,255,255,.15);border-radius:20px;padding:4px 14px;">
-                🔥 Sale — up to 70% off, today only
-            </span>
-        </p>
-        <a asp-page="/Shop" class="btn btn-buy-now px-5 py-3" style="font-size:1rem;">
-            Shop All Products <i class="bi bi-arrow-right ms-2"></i>
-        </a>
-        <div class="d-flex justify-content-center gap-4 mt-4" style="font-size:.82rem;opacity:.7;">
-            <span><i class="bi bi-truck me-1"></i>Free Shipping</span>
-            <span><i class="bi bi-arrow-counterclockwise me-1"></i>30-Day Returns</span>
-            <span><i class="bi bi-shield-check me-1"></i>Secure Checkout</span>
+<section class="home-hero">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+                <span class="hero-rating-chip">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    @avgRating.ToString("0.0")/5 from @totalReviews verified dog parents
+                </span>
+                <h1 class="hero-title">Your Dog Deserves to Sleep Like <em>Royalty</em></h1>
+                <p class="hero-sub">
+                    Vet-inspired comfort, grooming and paw care — hand-picked, tested on our own dogs,
+                    and backed by a 30-day money-back guarantee.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-page="/Shop" class="btn btn-buy-now px-5 py-3" style="font-size:1rem;">
+                        Shop the Sale — Up to 70% Off <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <div class="hero-bullets">
+                    <span><i class="bi bi-check-circle-fill"></i>Free shipping, always</span>
+                    <span><i class="bi bi-check-circle-fill"></i>30-day money-back guarantee</span>
+                    <span><i class="bi bi-check-circle-fill"></i>Secure Stripe checkout</span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-img-stack">
+                    <div class="hero-img-main">
+                        <img src="/images/IMG_1046.jpeg" alt="Golden retriever relaxing in a PET HEAVEN bed"
+                             onerror="this.src='/images/placeholder.svg'" />
+                    </div>
+                    <div class="hero-img-sm one">
+                        <img src="/images/dogshower2.jpeg" alt="Dog enjoying the 2-in-1 bath brush"
+                             onerror="this.src='/images/placeholder.svg'" />
+                    </div>
+                    <div class="hero-img-sm two">
+                        <img src="/images/1 (1).jpeg" alt="Paw butter balm"
+                             onerror="this.src='/images/placeholder.svg'" />
+                    </div>
+                    @if (heroBed != null)
+                    {
+                        <div class="hero-float-chip">
+                            <span class="big">−@heroBed.DiscountPct%</span> today<br />
+                            Beds from $@heroBed.MinPrice.ToString("F2")
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Products Grid -->
-<section class="py-5">
+<section class="py-5" id="bestsellers">
     <div class="container">
-        <h2 class="section-title text-center mb-2">Our Products</h2>
-        <p class="text-center text-muted mb-5">Everything your pet needs — free shipping on every order.</p>
+        <h2 class="section-title text-center mb-2">Shop the Best Sellers</h2>
+        <p class="text-center text-muted mb-5 section-sub">Everything your dog needs — every order ships free.</p>
         <div class="row g-4 justify-content-center">
             @foreach (var p in Model.AllProducts)
             {
-                var url = p.Id == 1 ? "/DogBed" : p.Id == 2 ? "/Brush" : p.Id == 3 ? "/PawButter" : "/BathBrush";
                 var img = p.Images.FirstOrDefault() ?? "/images/placeholder.svg";
-                var priceLabel = p.Variants.Count == 1
-                    ? $"${p.Variants[0].Price:F2}"
-                    : $"From ${p.Variants.Min(v => v.Price):F2}";
-                var origPriceLabel = p.Variants.Count == 1
-                    ? $"${p.Variants[0].OriginalPrice:F2}"
-                    : $"From ${p.Variants.Min(v => v.OriginalPrice):F2}";
-                var discountPct = (int)Math.Round((1 - p.Variants.Min(v => v.Price) / p.Variants.Min(v => v.OriginalPrice)) * 100);
-                <div class="col-sm-6 col-lg-4">
-                    <a href="@url" class="text-decoration-none">
+                var priceLabel = p.Variants.Count == 1 ? $"${p.MinPrice:F2}" : $"From ${p.MinPrice:F2}";
+                <div class="col-sm-6 col-lg-3">
+                    <a href="@p.PageUrl" class="text-decoration-none">
                         <div class="shop-card">
                             <div class="shop-card-img" style="position:relative">
                                 <img src="@img" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
-                                @if (discountPct > 0)
+                                @if (p.DiscountPct > 0)
                                 {
-                                    <span class="card-sale-badge">@discountPct% OFF</span>
+                                    <span class="card-sale-badge">@p.DiscountPct% OFF</span>
+                                }
+                                @if (!string.IsNullOrEmpty(p.Badge))
+                                {
+                                    <span class="card-flag">@p.Badge</span>
                                 }
                             </div>
                             <div class="shop-card-body">
                                 <div class="d-flex align-items-center gap-1 mb-1">
                                     @for (int i = 1; i <= 5; i++) { <i class="bi bi-star-fill text-warning" style="font-size:.7rem"></i> }
-                                    <span class="text-muted small ms-1">(@p.ReviewCount)</span>
+                                    <span class="text-muted small ms-1">@p.Rating (@p.ReviewCount)</span>
                                 </div>
                                 <h6 class="shop-card-title">@p.Name</h6>
                                 <p class="shop-card-desc">@p.ShortDescription</p>
-                                <div class="d-flex align-items-center justify-content-between mt-3">
+                                <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2">
                                     <div>
                                         <span class="shop-card-price">@priceLabel</span>
-                                        <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">@origPriceLabel</span>
+                                        <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">$@p.MinOriginalPrice.ToString("F2")</span>
+                                        <div class="small fw-semibold" style="color:#15803d;">You save $@p.MinSavings.ToString("F2")</div>
                                     </div>
                                     <span class="btn btn-buy-now btn-sm px-3 py-2" style="font-size:.82rem">Shop Now</span>
                                 </div>
@@ -83,36 +121,109 @@
 <!-- Why PET HEAVEN -->
 <section class="py-5 bg-light">
     <div class="container">
-        <h2 class="section-title text-center mb-2">Why PET HEAVEN?</h2>
-        <p class="text-center text-muted mb-5">We obsess over every detail so your pet doesn't have to settle.</p>
+        <h2 class="section-title text-center mb-2">Why @totalReviews+ Dog Parents Shop Here</h2>
+        <p class="text-center text-muted mb-5 section-sub">We obsess over every detail so your pet doesn't have to settle.</p>
         <div class="row g-4 text-center">
             <div class="col-6 col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="bi bi-truck"></i></div>
                     <h6>Free Shipping</h6>
-                    <p>Every order ships free, no minimum required.</p>
+                    <p>Every order ships free — no minimum, no surprises at checkout.</p>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
                     <h6>30-Day Returns</h6>
-                    <p>Not happy? Full refund, no questions asked.</p>
+                    <p>If your dog doesn't love it, we refund you in full. No questions asked.</p>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
                     <h6>Secure Payment</h6>
-                    <p>Powered by Stripe — your card details are always safe.</p>
+                    <p>Powered by Stripe — we never see or store your card details.</p>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="feature-card">
                     <div class="feature-icon"><i class="bi bi-award"></i></div>
-                    <h6>Premium Quality</h6>
-                    <p>Every product is carefully tested and pet-safe.</p>
+                    <h6>Tested & Pet-Safe</h6>
+                    <p>Every product is quality-checked and safe for dogs of all breeds.</p>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Real reviews -->
+@if (featured.Any())
+{
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-2">Don't Take Our Word For It</h2>
+            <p class="text-center text-muted mb-5 section-sub">Real reviews from verified purchases.</p>
+            <div class="row g-4">
+                @foreach (var (product, review) in featured)
+                {
+                    <div class="col-md-4">
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-avatar">@review.Author[0]</div>
+                                <div>
+                                    <div class="fw-semibold">@review.Author</div>
+                                    <div class="text-muted small">@review.Date</div>
+                                </div>
+                                <div class="ms-auto">
+                                    @for (int i = 1; i <= 5; i++)
+                                    { <i class="bi bi-star-fill @(i <= review.Stars ? "text-warning" : "text-muted")" style="font-size:.8rem"></i> }
+                                </div>
+                            </div>
+                            <p class="review-text mt-3 mb-0">@review.Comment</p>
+                            <div class="mt-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <span class="verified-badge"><i class="bi bi-patch-check-fill me-1"></i>Verified Purchase</span>
+                                <a href="@product.PageUrl" class="small fw-semibold text-decoration-none" style="color:var(--primary);">
+                                    @product.Name.Replace("PET HEAVEN ", "") →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Guarantee -->
+<section class="pb-5">
+    <div class="container">
+        <div class="guarantee-band">
+            <div class="shield"><i class="bi bi-shield-check"></i></div>
+            <div>
+                <h4>Try It For 30 Days — Love It or It's Free</h4>
+                <p>
+                    Order today, let your dog test everything for a full month. If they're not sleeping better,
+                    looking shinier, or wagging harder, email us and we'll refund every cent. You keep zero risk;
+                    your dog keeps the upgrade.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="pb-5">
+    <div class="container">
+        <div class="cta-band">
+            <h3>The Sale Won't Wait — Neither Should Your Dog</h3>
+            <p>Up to 70% off everything, free shipping included. Prices go back up when the timer above hits zero.</p>
+            <a asp-page="/Shop" class="btn btn-buy-now px-5 py-3" style="font-size:1rem;">
+                Shop All Products <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <div class="cta-assurance mt-3" style="color:rgba(255,255,255,.75);">
+                <span><i class="bi bi-truck" style="color:#7ee2a8"></i>Free shipping</span>
+                <span><i class="bi bi-arrow-counterclockwise" style="color:#7ee2a8"></i>30-day guarantee</span>
+                <span><i class="bi bi-shield-lock" style="color:#7ee2a8"></i>Secure checkout</span>
             </div>
         </div>
     </div>

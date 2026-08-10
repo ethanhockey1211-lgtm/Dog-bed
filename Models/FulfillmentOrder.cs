@@ -16,8 +16,13 @@ public class FulfillmentOrder
     public decimal AmountPaid { get; set; }
     public FulfillmentStatus Status { get; set; } = FulfillmentStatus.Pending;
     public string? AliExpressOrderId { get; set; }
+    public string? TrackingNumber { get; set; }
+    public DateTime? FulfilledAt { get; set; }
     public string? ErrorMessage { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public string FirstName => CustomerName.Split(' ', 2).FirstOrDefault() ?? "";
+    public string LastName  => CustomerName.Contains(' ') ? CustomerName.Split(' ', 2)[1] : "";
 }
 
 public enum FulfillmentStatus

@@ -22,6 +22,9 @@ public class EmailService
         var items = string.Join("\n", order.Items.Select(i =>
             $"  • {i.ProductName} — {i.Size} x{i.Quantity} — ${i.LineTotal:F2}"));
 
+        var supplierItems = string.Join("\n", order.Items.Select(i =>
+            $"  {i.ProductName}\n  Variant: {i.Size} / {i.Color}   Qty: {i.Quantity}"));
+
         await SendAsync(
             to: _config["Email:NotifyTo"] ?? "",
             subject: $"New Order #{order.StripeSessionId[^8..].ToUpper()} — ${order.AmountPaid:F2}",
@@ -37,15 +40,58 @@ public class EmailService
                 Email:  {order.CustomerEmail}
                 Phone:  {order.Phone}
 
-                SHIP TO
-                {order.Address}
-                {order.City}, {order.State} {order.ZipCode}
-                {order.Country}
-
                 ITEMS
                 {items}
+
+                ── PASTE INTO ALIEXPRESS ─────────
+                Contact name:   {order.CustomerName}
+                Phone:          {order.Phone}
+                Street address: {order.Address}
+                City:           {order.City}
+                State/Province: {order.State}
+                ZIP code:       {order.ZipCode}
+                Country:        {order.Country}
+
+                ORDER THESE
+                {supplierItems}
                 ══════════════════════════════════
-                Go to AliExpress and ship to the address above.
+                One-click copy buttons for every field are in your
+                admin dashboard → /orders
+                """);
+    }
+
+    public async Task SendShippingConfirmationAsync(FulfillmentOrder order)
+    {
+        if (string.IsNullOrEmpty(order.CustomerEmail)) return;
+
+        var firstName = order.CustomerName.Split(' ')[0];
+        var items = string.Join("\n", order.Items.Select(i =>
+            $"  • {i.ProductName} — {i.Size} x{i.Quantity}"));
+        var tracking = string.IsNullOrWhiteSpace(order.TrackingNumber)
+            ? "Tracking details will follow shortly."
+            : $"Tracking number: {order.TrackingNumber}";
+
+        await SendAsync(
+            to: order.CustomerEmail,
+            subject: $"Your PET HEAVEN order #{order.StripeSessionId[^8..].ToUpper()} is on the way!",
+            body: $"""
+                Hi {firstName},
+
+                Great news — your order has shipped and is headed your way.
+
+                {tracking}
+
+                WHAT'S IN THE BOX
+                {items}
+
+                SHIPPING TO
+                {order.Address}
+                {order.City}, {order.State} {order.ZipCode}
+
+                ══════════════════════════════════
+                Questions? Just reply to this email.
+
+                — The PET HEAVEN Team
                 """);
     }
 

@@ -15,10 +15,12 @@ public class DogBedModel : PageModel
     }
 
     public Product? Product { get; set; }
+    public List<Product> CrossSells { get; set; } = [];
 
     public void OnGet()
     {
         Product = _productService.GetById(1);
+        CrossSells = _productService.GetAll().Where(p => p.Id != 1).ToList();
     }
 
     public IActionResult OnPostAddToCart(int productId, string size, int quantity)
@@ -26,18 +28,20 @@ public class DogBedModel : PageModel
         var product = _productService.GetById(productId);
         if (product == null) return BadRequest();
 
-        var variant = product.Variants.FirstOrDefault(v => v.Size == size);
+        var variant = product.Variants.FirstOrDefault(v => v.Size == size)
+                      ?? product.Variants.FirstOrDefault();
         if (variant == null) return BadRequest();
 
         var item = new CartItem
         {
             ProductId = product.Id,
             ProductName = product.Name,
-            Size = size,
+            Size = variant.Size,
             Color = variant.Color,
             DimensionsCm = variant.DimensionsCm,
             UnitPrice = variant.Price,
-            Quantity = quantity,
+            OriginalUnitPrice = variant.OriginalPrice,
+            Quantity = Math.Max(1, quantity),
             Image = product.Images.FirstOrDefault() ?? "/images/placeholder.svg"
         };
 

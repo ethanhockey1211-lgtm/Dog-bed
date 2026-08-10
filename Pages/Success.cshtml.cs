@@ -36,6 +36,7 @@ public class SuccessModel : PageModel
         if (Order != null)
         {
             CustomerEmail = Order.CustomerEmail;
+            CartService.ClearCart(HttpContext.Session);
             return;
         }
 
@@ -64,6 +65,7 @@ public class SuccessModel : PageModel
         _store.Save(order);
         await _queue.EnqueueAsync(order);
         Order = order;
+        CartService.ClearCart(HttpContext.Session);
 
         // Send emails — errors are logged inside EmailService but don't break the page
         await _email.SendOrderNotificationAsync(order);

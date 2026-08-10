@@ -1,0 +1,66 @@
+@model List<DogBed.Models.Product>
+@if (Model.Any())
+{
+    <section class="xsell-section py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-2">Pairs Perfectly With</h2>
+            <p class="text-center text-muted mb-4 section-sub">Build the full spa-day setup — everything ships free together.</p>
+            <div class="row g-3 justify-content-center">
+                @foreach (var p in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="xsell-card">
+                            <a href="@p.PageUrl" class="xsell-img">
+                                <img src="@(p.Images.FirstOrDefault() ?? "/images/placeholder.svg")" alt="@p.Name"
+                                     onerror="this.src='/images/placeholder.svg'" />
+                            </a>
+                            <div class="flex-grow-1" style="min-width:0">
+                                <a class="xsell-name" href="@p.PageUrl">@p.Name</a>
+                                <div class="xsell-price">
+                                    <span class="now">$@p.MinPrice.ToString("F2")</span>
+                                    <span class="was">$@p.MinOriginalPrice.ToString("F2")</span>
+                                    <span class="save-chip ms-1">−@p.DiscountPct%</span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-quick-add" data-price="@p.MinPrice.ToString("F2")"
+                                    onclick="phQuickAdd(this, @p.Id, '@Html.Raw(p.Name.Replace("'", "\\'"))')">
+                                + Add
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+    <script>
+        async function phQuickAdd(btn, productId, productName) {
+            if (btn.classList.contains('added')) return;
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const fd = new FormData();
+            fd.append('productId', productId);
+            fd.append('size', '');
+            fd.append('quantity', '1');
+            if (tokenInput) fd.append('__RequestVerificationToken', tokenInput.value);
+            const url = window.phQuickAddUrl || (window.location.pathname + '?handler=AddToCart');
+            const resp = await fetch(url, {
+                method: 'POST', body: fd,
+                headers: tokenInput ? { 'RequestVerificationToken': tokenInput.value } : {}
+            });
+            if (resp.ok) {
+                btn.classList.add('added');
+                btn.textContent = '✓ Added';
+                if (typeof refreshCartBadge === 'function') refreshCartBadge();
+                if (typeof fbq === 'function') {
+                    fbq('track', 'AddToCart', {
+                        content_name: productName,
+                        content_ids: [String(productId)],
+                        content_type: 'product',
+                        value: parseFloat(btn.dataset.price || '0'),
+                        currency: 'USD'
+                    });
+                }
+                if (window.phQuickAddReload) setTimeout(() => location.reload(), 350);
+            }
+        }
+    </script>
+}

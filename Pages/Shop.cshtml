@@ -1,24 +1,34 @@
 @page
 @model ShopModel
 @{
-    ViewData["Title"] = "Shop — PET HEAVEN";
+    ViewData["Title"] = "Shop All — Up to 70% Off";
+    ViewData["Description"] = "Shop premium dog beds, grooming brushes, paw butter and bath brushes — up to 70% off with free shipping and a 30-day money-back guarantee.";
 }
 
 <div class="container py-5">
-    <h1 class="page-title text-center mb-2">Our Products</h1>
-    <p class="text-center text-muted mb-5">Premium pet supplies — free shipping on every order.</p>
+    <h1 class="page-title text-center mb-2">Shop All Products</h1>
+    <p class="text-center text-muted mb-2">Premium pet supplies — free shipping on every order.</p>
+    <p class="text-center mb-5">
+        <span class="save-chip"><i class="bi bi-fire me-1"></i>Sale prices end when the timer above runs out</span>
+    </p>
 
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
         @foreach (var p in Model.Products)
         {
-            <div class="col-sm-6 col-lg-4">
-                <a href="@p.Url" class="text-decoration-none">
+            var img = p.Images.FirstOrDefault() ?? "/images/placeholder.svg";
+            var priceLabel = p.Variants.Count == 1 ? $"${p.MinPrice:F2}" : $"From ${p.MinPrice:F2}";
+            <div class="col-sm-6 col-lg-3">
+                <a href="@p.PageUrl" class="text-decoration-none">
                     <div class="shop-card">
                         <div class="shop-card-img" style="position:relative">
-                            <img src="@p.Image" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
+                            <img src="@img" alt="@p.Name" onerror="this.src='/images/placeholder.svg'" />
                             @if (p.DiscountPct > 0)
                             {
                                 <span class="card-sale-badge">@p.DiscountPct% OFF</span>
+                            }
+                            @if (!string.IsNullOrEmpty(p.Badge))
+                            {
+                                <span class="card-flag">@p.Badge</span>
                             }
                         </div>
                         <div class="shop-card-body">
@@ -27,17 +37,15 @@
                                 {
                                     <i class="bi bi-star-fill text-warning" style="font-size:.7rem"></i>
                                 }
-                                <span class="text-muted small ms-1">(@p.ReviewCount)</span>
+                                <span class="text-muted small ms-1">@p.Rating (@p.ReviewCount)</span>
                             </div>
                             <h6 class="shop-card-title">@p.Name</h6>
                             <p class="shop-card-desc">@p.ShortDescription</p>
-                            <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2">
                                 <div>
-                                    <span class="shop-card-price">@p.PriceLabel</span>
-                                    @if (!string.IsNullOrEmpty(p.OriginalPriceLabel))
-                                    {
-                                        <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">@p.OriginalPriceLabel</span>
-                                    }
+                                    <span class="shop-card-price">@priceLabel</span>
+                                    <span style="text-decoration:line-through;color:#aaa;font-size:.78rem;margin-left:5px;">$@p.MinOriginalPrice.ToString("F2")</span>
+                                    <div class="small fw-semibold" style="color:#15803d;">You save $@p.MinSavings.ToString("F2")</div>
                                 </div>
                                 <span class="btn btn-buy-now btn-sm px-3 py-2" style="font-size:.82rem">Shop Now</span>
                             </div>
@@ -46,5 +54,13 @@
                 </a>
             </div>
         }
+    </div>
+
+    <div class="guarantee-band mt-5">
+        <div class="shield"><i class="bi bi-shield-check"></i></div>
+        <div>
+            <h4>Every Order Is Risk-Free</h4>
+            <p>30-day money-back guarantee on everything. If your dog doesn't love it, we refund it — no forms, no fuss, no return shipping drama.</p>
+        </div>
     </div>
 </div>

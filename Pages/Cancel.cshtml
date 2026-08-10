@@ -1,16 +1,35 @@
 @page
 @model CancelModel
+@inject IConfiguration Config
 @{
     ViewData["Title"] = "Payment Cancelled";
+    var promoCode = Config["Promo:Code"] ?? "WELCOME10";
+    var promoPct  = Config["Promo:Percent"] ?? "10";
 }
 
-<div class="container py-5 text-center">
-    <div style="font-size:4rem; color: var(--text-muted);" class="mb-3">
-        <i class="bi bi-x-circle"></i>
+<div class="container py-5 text-center" style="max-width:520px;">
+    <div style="font-size:4rem;" class="mb-2">🐶</div>
+    <h2 class="mb-2">No charge was made</h2>
+    <p class="text-muted mb-4">
+        Your cart and shipping details are saved exactly as you left them —
+        finishing your order takes about 30 seconds.
+    </p>
+
+    <div class="p-3 mb-4" style="background:var(--primary-light);border:2px dashed var(--primary);border-radius:12px;">
+        <div class="fw-semibold mb-1" style="color:var(--primary-dark);">Was it the price?</div>
+        <div class="small text-muted mb-2">Use code <strong>@promoCode</strong> at checkout for @promoPct% off your first order.</div>
+        <div class="promo-code-box mb-0" onclick="copyText('@promoCode', this)" title="Click to copy">@promoCode</div>
     </div>
-    <h2 class="mb-2">Payment cancelled</h2>
-    <p class="text-muted mb-4">No charge was made. Your cart is still saved.</p>
-    <a asp-page="/Cart" class="btn btn-add-cart px-5">
-        <i class="bi bi-arrow-left me-2"></i>Back to Cart
+
+    <a asp-page="/Checkout" class="btn btn-buy-now px-5 mb-2 w-100">
+        <i class="bi bi-lock-fill me-2"></i>Return to Checkout
     </a>
+    <a asp-page="/Cart" class="btn btn-add-cart px-5 w-100">
+        <i class="bi bi-bag me-2"></i>Review My Cart
+    </a>
+    <div class="cta-assurance mt-3">
+        <span><i class="bi bi-shield-check"></i>30-day guarantee</span>
+        <span><i class="bi bi-truck"></i>Free shipping</span>
+        <span><i class="bi bi-lock"></i>Secure Stripe checkout</span>
+    </div>
 </div>

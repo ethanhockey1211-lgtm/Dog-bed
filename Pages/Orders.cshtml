@@ -1,4 +1,5 @@
 @page
+@using DogBed.Models
 @model OrdersModel
 @{
     ViewData["Title"] = "Orders";
@@ -24,70 +25,171 @@
 else
 {
     <div class="container py-5">
-        <h1 class="page-title mb-1">Orders</h1>
-        <p class="text-muted mb-4">Every paid order — fulfill each one on AliExpress using the shipping details below.</p>
+        <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-1">
+            <h1 class="page-title mb-0">Fulfillment</h1>
+            <div class="text-muted small">
+                <strong>@Model.CountAll</strong> orders ·
+                <strong>$@Model.Revenue.ToString("F2")</strong> collected
+            </div>
+        </div>
+        <p class="text-muted mb-4">Click any field to copy it, then paste straight into AliExpress checkout.</p>
+
+        <div class="admin-tabs">
+            <a class="admin-tab @(Model.Filter == "todo" ? "active" : "")" asp-page="/Orders" asp-route-f="todo">
+                Needs ordering <span class="count">@Model.CountTodo</span>
+            </a>
+            <a class="admin-tab @(Model.Filter == "placed" ? "active" : "")" asp-page="/Orders" asp-route-f="placed">
+                Placed on AliExpress <span class="count">@Model.CountPlaced</span>
+            </a>
+            <a class="admin-tab @(Model.Filter == "shipped" ? "active" : "")" asp-page="/Orders" asp-route-f="shipped">
+                Shipped <span class="count">@Model.CountShipped</span>
+            </a>
+            <a class="admin-tab @(Model.Filter == "all" ? "active" : "")" asp-page="/Orders" asp-route-f="all">
+                All <span class="count">@Model.CountAll</span>
+            </a>
+        </div>
 
         @if (!Model.Orders.Any())
         {
             <div class="text-center py-5 text-muted">
                 <i class="bi bi-inbox display-3 d-block mb-3"></i>
-                No orders yet. They'll appear here after customers pay.
+                Nothing here yet — paid orders land in this list automatically.
             </div>
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table size-table">
-                    <thead>
-                        <tr>
-                            <th>Ref</th>
-                            <th>Date</th>
-                            <th>Customer</th>
-                            <th>Ship To</th>
-                            <th>Items</th>
-                            <th>Paid</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var o in Model.Orders)
+            foreach (var o in Model.Orders)
+            {
+                var reference = o.StripeSessionId.Length >= 8 ? o.StripeSessionId[^8..].ToUpper() : o.Id;
+                var addressBlock = $"{o.CustomerName}\n{o.Address}\n{o.City}, {o.State} {o.ZipCode}\n{o.Country}\nPhone: {o.Phone}";
+                var aliBlock = $"Contact name: {o.CustomerName}\nPhone: {o.Phone}\nStreet: {o.Address}\nCity: {o.City}\nState/Province: {o.State}\nZIP: {o.ZipCode}\nCountry: {o.Country}";
+
+                <div class="order-card">
+                    <div class="order-card-head">
+                        <span class="ref">#PH-@reference</span>
+                        <span class="text-muted">@o.CreatedAt.ToString("MMM d, h:mm tt") UTC</span>
+                        <span>@o.CustomerName</span>
+                        <span class="amount ms-auto">$@o.AmountPaid.ToString("F2")</span>
+                        <span class="status-pill status-@o.Status.ToString().ToLower()">
+                            @(o.Status switch
+                            {
+                                FulfillmentStatus.Pending => "Needs ordering",
+                                FulfillmentStatus.Processing => "Placed",
+                                FulfillmentStatus.Fulfilled => "Shipped",
+                                _ => "Failed"
+                            })
+                        </span>
+                    </div>
+                    <div class="order-card-body">
+
+                        <div class="order-items">
+                            @foreach (var item in o.Items)
+                            {
+                                <div class="order-item-row">
+                                    <span class="qty-flag">×@item.Quantity</span>
+                                    <strong>@item.ProductName</strong>
+                                    <span class="variant">@item.Size · @item.Color · @item.DimensionsCm</span>
+                                    <span class="text-muted">$@item.LineTotal.ToString("F2")</span>
+                                    <a class="supplier-link" href="@Model.SupplierLink(item)" target="_blank" rel="noopener">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Find on AliExpress
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="copy-actions">
+                            <button type="button" class="btn-copy-all" data-copy="@aliBlock"
+                                    onclick="copyText(this.dataset.copy, this)">
+                                <i class="bi bi-clipboard-check"></i> Copy all for AliExpress
+                            </button>
+                            <button type="button" class="btn-copy-all secondary" data-copy="@addressBlock"
+                                    onclick="copyText(this.dataset.copy, this)">
+                                <i class="bi bi-envelope-paper"></i> Copy address block
+                            </button>
+                        </div>
+
+                        <div class="copy-grid">
+                            <button type="button" class="copy-chip" data-copy="@o.CustomerName" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">Contact name</span><span class="v">@o.CustomerName</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.Phone" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">Phone</span><span class="v">@(string.IsNullOrWhiteSpace(o.Phone) ? "—" : o.Phone)</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.Address" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">Street address</span><span class="v">@o.Address</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.City" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">City</span><span class="v">@o.City</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.State" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">State / Province</span><span class="v">@o.State</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.ZipCode" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">ZIP</span><span class="v">@o.ZipCode</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.Country" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">Country</span><span class="v">@o.Country</span>
+                            </button>
+                            <button type="button" class="copy-chip" data-copy="@o.CustomerEmail" onclick="copyText(this.dataset.copy, this)">
+                                <span class="k">Customer email</span><span class="v">@o.CustomerEmail</span>
+                            </button>
+                        </div>
+
+                        @if (o.Status is FulfillmentStatus.Pending or FulfillmentStatus.Failed)
                         {
-                            <tr>
-                                <td><code class="small">#PH-@o.Id</code></td>
-                                <td class="small">@o.CreatedAt.ToString("MMM d, h:mm tt")</td>
-                                <td>
-                                    <div class="fw-semibold small">@o.CustomerName</div>
-                                    <div class="text-muted" style="font-size:.75rem">@o.CustomerEmail</div>
-                                    @if (!string.IsNullOrWhiteSpace(o.Phone))
-                                    {
-                                        <div class="text-muted" style="font-size:.75rem">@o.Phone</div>
-                                    }
-                                </td>
-                                <td class="small">
-                                    @o.Address<br />
-                                    @o.City, @o.State @o.ZipCode<br />
-                                    @o.Country
-                                </td>
-                                <td>
-                                    @foreach (var item in o.Items)
-                                    {
-                                        <div class="small">
-                                            <strong>@item.ProductName</strong><br/>
-                                            <span class="text-muted">@item.Size · @item.Color · qty @item.Quantity — $@item.LineTotal.ToString("F2")</span>
-                                        </div>
-                                    }
-                                </td>
-                                <td class="fw-bold">$@o.AmountPaid.ToString("F2")</td>
-                                <td>
-                                    <span class="status-pill status-@o.Status.ToString().ToLower()">
-                                        @o.Status
-                                    </span>
-                                </td>
-                            </tr>
+                            <form method="post" asp-page-handler="MarkPlaced" class="fulfill-controls">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="sessionId" value="@o.StripeSessionId" />
+                                <input type="hidden" name="f" value="@Model.Filter" />
+                                <input type="text" name="aliOrderId" class="form-control" placeholder="AliExpress order # (optional)" />
+                                <button type="submit" class="btn-status place">
+                                    <i class="bi bi-cart-check me-1"></i>Mark placed on AliExpress
+                                </button>
+                            </form>
                         }
-                    </tbody>
-                </table>
-            </div>
+                        else if (o.Status == FulfillmentStatus.Processing)
+                        {
+                            <form method="post" asp-page-handler="MarkShipped" class="fulfill-controls">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="sessionId" value="@o.StripeSessionId" />
+                                <input type="hidden" name="f" value="@Model.Filter" />
+                                @if (!string.IsNullOrWhiteSpace(o.AliExpressOrderId))
+                                {
+                                    <span class="fulfill-meta">AliExpress order: <code>@o.AliExpressOrderId</code></span>
+                                }
+                                <input type="text" name="tracking" class="form-control" placeholder="Tracking number (optional)" />
+                                <button type="submit" class="btn-status ship">
+                                    <i class="bi bi-truck me-1"></i>Mark shipped + email customer
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="fulfill-controls">
+                                <span class="fulfill-meta">
+                                    <i class="bi bi-check-circle-fill me-1" style="color:#15803d;"></i>
+                                    Shipped @(o.FulfilledAt?.ToString("MMM d, h:mm tt") ?? "")
+                                    @if (!string.IsNullOrWhiteSpace(o.AliExpressOrderId))
+                                    {
+                                        <text> · AliExpress <code>@o.AliExpressOrderId</code></text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(o.TrackingNumber))
+                                    {
+                                        <text> · Tracking <code>@o.TrackingNumber</code></text>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(o.TrackingNumber))
+                                {
+                                    <button type="button" class="btn-copy-all secondary" data-copy="@o.TrackingNumber"
+                                            onclick="copyText(this.dataset.copy, this)">
+                                        <i class="bi bi-clipboard"></i> Copy tracking
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         }
     </div>
 }

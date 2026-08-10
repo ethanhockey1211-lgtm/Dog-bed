@@ -5,8 +5,35 @@
     var product = Model.Product!;
     var variants = product.Variants;
     var firstImage = product.Images.First();
+    ViewData["Description"] = product.ShortDescription + " Free shipping, 30-day money-back guarantee.";
+    ViewData["OgImage"] = firstImage;
     var deliveryStart = DateTime.Now.AddDays(5).ToString("MMMM d");
     var deliveryEnd = DateTime.Now.AddDays(12).ToString("MMMM d");
+    var v0 = variants.First();
+}
+
+@section Head {
+    <script type="application/ld+json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object?>
+    {
+        ["@context"] = "https://schema.org",
+        ["@type"] = "Product",
+        ["name"] = product.Name,
+        ["description"] = product.ShortDescription,
+        ["image"] = product.Images,
+        ["aggregateRating"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "AggregateRating",
+            ["ratingValue"] = product.Rating,
+            ["reviewCount"] = product.ReviewCount
+        },
+        ["offers"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "Offer",
+            ["priceCurrency"] = "USD",
+            ["price"] = v0.Price.ToString("F2"),
+            ["availability"] = "https://schema.org/InStock"
+        }
+    }))</script>
 }
 
 <!-- Hero / Product Section -->
@@ -55,14 +82,17 @@
 
                     <!-- Price -->
                     <div class="price-block" id="priceBlock">
-                        <span class="sale-price">$@variants.First().Price.ToString("F2")</span>
-                        <span style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@variants.First().OriginalPrice.ToString("F2")</span>
-                        <span style="background:#e8f5e9;color:#2e7d32;font-size:.8rem;font-weight:700;padding:3px 8px;border-radius:4px;margin-left:8px;">SAVE 50%</span>
+                        <span class="sale-price">$@v0.Price.ToString("F2")</span>
+                        <span style="text-decoration:line-through;color:#999;font-size:1rem;margin-left:8px;">$@v0.OriginalPrice.ToString("F2")</span>
+                        <span class="save-chip" style="margin-left:8px;">SAVE $@((v0.OriginalPrice - v0.Price).ToString("F2"))</span>
                     </div>
 
                     <!-- Shipping + delivery -->
-                    <div class="mt-2 mb-3" style="font-size:.85rem;color:#555;">
+                    <div class="mt-2 mb-1" style="font-size:.85rem;color:#555;">
                         <i class="bi bi-truck text-success me-1"></i> <strong>Free shipping</strong> — estimated delivery <strong>@deliveryStart – @deliveryEnd</strong>
+                    </div>
+                    <div class="stock-line ok mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i>In stock — ships within 24 hours
                     </div>
 
                     <hr />
@@ -78,13 +108,25 @@
                     </div>
 
                     <!-- CTA Buttons -->
-                    <div class="cta-buttons mb-3">
+                    <div class="cta-buttons mb-2">
                         <button class="btn btn-add-cart w-100 mb-2" onclick="addToCart()">
                             <i class="bi bi-bag-plus me-2"></i>Add to Cart
                         </button>
                         <a asp-page="/Checkout" class="btn btn-buy-now w-100" onclick="return buyNow(event)">
                             <i class="bi bi-lightning-fill me-2"></i>Buy It Now
                         </a>
+                    </div>
+                    <div class="cta-assurance mb-3">
+                        <span><i class="bi bi-shield-check"></i>30-day guarantee</span>
+                        <span><i class="bi bi-truck"></i>Free shipping</span>
+                        <span><i class="bi bi-arrow-counterclockwise"></i>Easy returns</span>
+                    </div>
+                    <div class="pay-row mb-3 justify-content-center">
+                        <span class="pay-chip"><i class="bi bi-credit-card-2-front-fill"></i>Visa</span>
+                        <span class="pay-chip"><i class="bi bi-credit-card-fill"></i>Mastercard</span>
+                        <span class="pay-chip"><i class="bi bi-credit-card"></i>Amex</span>
+                        <span class="pay-chip"><i class="bi bi-apple"></i>Pay</span>
+                        <span class="pay-chip"><i class="bi bi-google"></i>Pay</span>
                     </div>
 
                     <!-- Guarantee -->
@@ -304,6 +346,23 @@
     </div>
 </section>
 
+<!-- Cross-sell -->
+<partial name="_CrossSell" model="Model.CrossSells" />
+
+<!-- Sticky mobile add-to-cart -->
+<div class="sticky-atc" id="stickyAtc">
+    <div class="sticky-atc-img">
+        <img src="@firstImage" alt="@product.Name" onerror="this.src='/images/placeholder.svg'" />
+    </div>
+    <div class="sticky-atc-price">
+        <div class="now">$@v0.Price.ToString("F2")</div>
+        <div class="was">$@v0.OriginalPrice.ToString("F2")</div>
+    </div>
+    <button class="btn btn-buy-now" onclick="addToCart()">
+        <i class="bi bi-bag-plus me-1"></i>Add to Cart
+    </button>
+</div>
+
 <!-- Toast -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="cartToast" class="toast align-items-center border-0" role="alert">
@@ -368,5 +427,15 @@
         document.getElementById('formQty').value = 1;
         await buyNow(e);
     }
+
+    // Show the sticky bar once the buy box scrolls out of view
+    (function () {
+        const bar = document.getElementById('stickyAtc');
+        const anchor = document.getElementById('priceBlock');
+        if (!bar || !anchor || !('IntersectionObserver' in window)) return;
+        new IntersectionObserver(entries => {
+            bar.classList.toggle('show', !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0);
+        }).observe(anchor);
+    })();
 </script>
 }
